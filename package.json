@@ -1,0 +1,16 @@
+{
+  "name": "crowdfunding-backend",
+  "version": "1.0.0",
+  "description": "Node.JS SHPP crowdfunding backend",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "crowdfunding",
+    "shpp",
+    "liqpay"
+  ],
+  "author": "Ruslan Koptiev",
+  "license": "ISC"
+}
