@@ -35,6 +35,9 @@ out/
 # Editor-based Rest Client
 .idea/httpRequests
 
+# package-lock.json
+package-lock.json
+
 # Logs
 logs
 *.log
