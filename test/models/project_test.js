@@ -31,7 +31,7 @@ describe('Project', function () {
     });
 
     it('should update a project', async function () {
-        const projectId = await project.create(testProjectName);
+        const projectId = String(await project.create(testProjectName));
         const newName = 'Sony HDR 9000+';
         const newAmount = 1000;
         assert.ok(await project.update(projectId, newName, testProjectDescription, testPlannedSpendings, '', newAmount));
@@ -43,11 +43,11 @@ describe('Project', function () {
     });
 
     it('should not update a project that not exist', async function () {
-        await assert.rejects(project.update('5cd405cbf747eb3e79e63298', testProjectName, testProjectDescription, testPlannedSpendings, testPlannedSpendings, 1000));
+        assert.strictEqual(await project.update('5cd405cbf747eb3e79e63298', testProjectName, testProjectDescription, testPlannedSpendings, testPlannedSpendings, 1000), false);
     });
 
     it('should publish a project', async function () {
-        const projectId = await project.create(testProjectName);
+        const projectId = String(await project.create(testProjectName));
         await assert.doesNotReject(project.publish(projectId));
         const publishedProject = (await project.list())[0];
         assert.ok(publishedProject.published);

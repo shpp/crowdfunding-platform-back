@@ -1,29 +1,43 @@
 const assert = require('assert');
 
+const {ObjectID} = require("mongodb");
+
 const db = require('../db');
 const utils = require('../utils');
 
 COLLECTION_NAME = 'transactions';
 
-module.exports.create = async function (projectId, amount, type) {
+module.exports.create = async function (projectId, type, amount, donatorName, donatorPhone) {
     // Validate project ID
     assert.ok(utils.isValidProjectId(projectId), 'Project ID must be a 24-digit hex string.');
 
-    // Validate amount
-    if (typeof amount !== 'number' || isNaN(amount) || !isFinite(amount) || amount <= 0) {
-        throw 'Amount must be a non-negative real number.'
+    // Validate type
+    if (type !== 'manual' && type !== 'liqpay') {
+        throw 'Only \'manual\' and \'liqpay\' types are supported.'
     }
 
-    // Validate type
-    if (type !== 'cash' && type !== 'liqpay') {
-        throw 'Only \'cash\' and \'liqpay\' types are supported.'
+    // Validate amount
+    assert.ok(utils.isValidAmountString(amount), 'Amount must be a positive real number.');
+
+    // Validate donator name
+    if (donatorName !== undefined && (typeof donatorName !== 'string' || donatorName.length === 0)) {
+        throw 'Wrong donator name.';
+    }
+
+    // Validate donator phone
+    if (donatorPhone !== undefined && !utils.isValidPhoneNumber(donatorPhone)) {
+        throw 'Wrong donator phone number.';
     }
 
     // Create transaction entry
     const transaction = {
-        projectId,
+        projectId: ObjectID(projectId),
         amount,
-        type
+        type,
+        donatorName,
+        donatorPhone,
+        time: new Date(),
+        status: 'confirmed'
     };
 
     // Save transaction record to DB
@@ -33,11 +47,41 @@ module.exports.create = async function (projectId, amount, type) {
     return response.insertedCount === 1 ? response.insertedId : null;
 };
 
-module.exports.listByProjectId = async function (projectId) {
+module.exports.revoke = async function(transactionId) {
+    // Validate transaction ID
+    assert.ok(utils.isValidTransactionId(transactionId), 'Transaction ID must be a 24-digit hex string.');
+
+    // Update transaction record
+    const response = await db.db().collection(COLLECTION_NAME).updateOne({_id: ObjectID(transactionId)}, {
+        $set: {
+            status: 'revoked'
+        }
+    });
+
+    // Check the result
+    return response.result.ok === 1 && response.result.nModified === 1;
+};
+
+module.exports.reaffirm = async function(transactionId) {
+    // Validate transaction ID
+    assert.ok(utils.isValidTransactionId(transactionId), 'Transaction ID must be a 24-digit hex string.');
+
+    // Update transaction record
+    const response = await db.db().collection(COLLECTION_NAME).updateOne({_id: ObjectID(transactionId)}, {
+        $set: {
+            status: 'confirmed'
+        }
+    });
+
+    // Check the result
+    return response.result.ok === 1 && response.result.nModified === 1;
+};
+
+module.exports.listByProjectId = async function(projectId) {
     // Validate project ID
     assert.ok(utils.isValidProjectId(projectId), 'Project ID must be a 24-digit hex string.');
 
-    return (await db.db().collection(COLLECTION_NAME).find({projectId}).toArray());
+    return (await db.db().collection(COLLECTION_NAME).find({projectId: ObjectID(projectId)}).toArray());
 };
 
 module.exports.list = async function () {

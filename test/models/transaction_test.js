@@ -19,24 +19,24 @@ describe('Transaction', function () {
     });
 
     it('should create a transaction', async function () {
-        assert.strictEqual((await transaction.create(testProjectId, 1000, 'liqpay')).constructor.name, 'ObjectID');
+        assert.strictEqual((await transaction.create(testProjectId, 'liqpay', 1000)).constructor.name, 'ObjectID');
     });
 
     it('should not create a transaction for invalid project ID', async function () {
-        await assert.rejects(transaction.create('123', 1000, 'liqpay'));
+        await assert.rejects(transaction.create('123', 'liqpay', 1000));
     });
 
     it('should not create a transaction with invalid amount', async function () {
-        await assert.rejects(transaction.create(testProjectId, 0, 'liqpay'));
+        await assert.rejects(transaction.create(testProjectId, 'liqpay', 0));
     });
 
     it('should not create a transaction with invalid type', async function () {
-        await assert.rejects(transaction.create(testProjectId, 0, 'bitcoin'));
+        await assert.rejects(transaction.create(testProjectId, 'bitcoin', 0));
     });
 
     it('should list all transactions', async function () {
-        await transaction.create(testProjectId, 500, 'liqpay');
-        await transaction.create('7f3a7d8bf747eb3e79e63910', 300, 'cash');
+        await transaction.create(testProjectId, 'liqpay', 500);
+        await transaction.create('7f3a7d8bf747eb3e79e63910', 'manual', 300);
 
         const transactions = await transaction.list();
 
@@ -45,14 +45,24 @@ describe('Transaction', function () {
     });
 
     it('should list all transactions by project ID', async function () {
-        await transaction.create(testProjectId, 500, 'liqpay');
-        await transaction.create(testProjectId, 200, 'cash');
-        await transaction.create('7f3a7d8bf747eb3e79e63910', 300, 'cash');
+        await transaction.create(testProjectId, 'liqpay', 500);
+        await transaction.create(testProjectId, 'manual', 200);
+        await transaction.create('7f3a7d8bf747eb3e79e63910', 'manual', 300);
 
         const projectTransactions = await transaction.listByProjectId(testProjectId);
 
         assert.strictEqual(projectTransactions.length, 2);
         assert.strictEqual(projectTransactions.reduce((sum, t) => sum + t.amount, 0), 700);
+    });
+
+    it('should revoke and reaffirm a transaction', async function () {
+        const transactionId = await transaction.create(testProjectId, 'liqpay', 500);
+
+        await assert.doesNotReject(transaction.revoke(String(transactionId)));
+        assert.strictEqual((await transaction.list())[0].status, 'revoked');
+
+        await assert.doesNotReject(transaction.reaffirm(String(transactionId)));
+        assert.strictEqual((await transaction.list())[0].status, 'confirmed');
     });
 
     // Clear DB and close connection after testing

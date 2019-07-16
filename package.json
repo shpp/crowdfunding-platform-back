@@ -1,11 +1,11 @@
 {
   "name": "crowdfunding-backend",
   "version": "1.0.0",
-  "description": "Node.JS SHPP crowdfunding backend",
+  "description": "Node.JS SHPP crowd-funding backend",
   "main": "src/app.js",
   "scripts": {
     "test": "env NODE_ENV=test mocha --recursive",
-    "start": "node src/app.js"
+    "start": "./start.sh"
   },
   "keywords": [
     "crowdfunding",
@@ -19,6 +19,8 @@
     "express": "^4.17.1",
     "mongodb": "^3.2.7",
     "multer": "^1.4.1",
+    "request": "^2.88.0",
+    "uuid": "^3.3.2",
     "winston": "^3.2.1"
   },
   "devDependencies": {

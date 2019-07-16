@@ -1,6 +1,6 @@
 const express = require('express');
 const logger = require('./log');
-// const {projects, transactions} = require('controllers');
+const {projects, transactions} = require('./controllers');
 
 // Create Express app instance
 let app = express();
@@ -9,8 +9,11 @@ let app = express();
 app.use(require('./middlewares/log'));
 
 // Set up controllers
-// app.use('api/v1/projects', projects);
-// app.use('api/v1/transactions', transactions);
+app.use('/api/v1/projects', projects);
+app.use('/api/v1/transactions', transactions);
+
+// Set up static route for images
+app.use('/static', express.static(process.env.FILE_STORAGE_PATH || 'uploads'));
 
 // Initialize DB
 require('./db').init(process.env.MONGODB_URI).then(() => {
@@ -19,5 +22,5 @@ require('./db').init(process.env.MONGODB_URI).then(() => {
     // Listen server
     return app.listen(process.env.PORT || 80)
 }).then(() => {
-    logger.info(`SHPP Crowdfunding backend app running.`)
+    logger.info(`SHPP Crowd-funding backend app running.`)
 });
