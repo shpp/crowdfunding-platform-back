@@ -63,13 +63,13 @@ router.route('/create')
 router.route('/revoke')
     .post(auth, async function (req, res) {
         // Validate transaction ID
-        if (req.body['transaction_id'] === undefined || !utils.isValidTransactionId(req.body['transaction_id'])) {
+        if (req.body['id'] === undefined || !utils.isValidTransactionId(req.body['id'])) {
             res.status(400).send({success: false, error: 'Missing or wrong transaction ID.'});
             return;
         }
 
         // Revoke transaction
-        const status = await Transaction.revoke(req.body['transaction_id']);
+        const status = await Transaction.revoke(req.body['id']);
 
         // Check DB operation for the error
         if (!status) {
@@ -86,13 +86,13 @@ router.route('/revoke')
 router.route('/reaffirm')
     .post(auth, async function (req, res) {
         // Validate transaction ID
-        if (req.body['transaction_id'] === undefined || !utils.isValidTransactionId(req.body['transaction_id'])) {
+        if (req.body['id'] === undefined || !utils.isValidTransactionId(req.body['id'])) {
             res.status(400).send({success: false, error: 'Missing or wrong transaction ID.'});
             return;
         }
 
         // Reaffirm a transaction
-        const status = await Transaction.reaffirm(req.body['transaction_id']);
+        const status = await Transaction.reaffirm(req.body['id']);
 
         // Check DB operation for the error
         if (!status) {

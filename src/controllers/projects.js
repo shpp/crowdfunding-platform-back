@@ -48,7 +48,7 @@ router.route('/create')
 router.route('/update')
     .post(auth, async function (req, res) {
         // Validate project ID
-        if (req.body['project_id'] === undefined || !utils.isValidProjectId(req.body['project_id'])) {
+        if (req.body['id'] === undefined || !utils.isValidProjectId(req.body['id'])) {
             res.status(400).send({success: false, error: 'Missing or wrong project ID.'});
             return;
         }
@@ -91,12 +91,12 @@ router.route('/update')
 
         // Update a project with new data
         const status = await Project.update(
-            req.body['project_id'],
+            req.body['id'],
             req.body['name'],
             req.body['description'],
             req.body['planned_spendings'],
             req.body['actual_spendings'],
-            req.body['amount']
+            Number(req.body['amount'])
         );
 
         // Check DB operation for the error
@@ -114,14 +114,14 @@ router.route('/update')
 router.route('/delete')
     .delete(auth, async function (req, res) {
         // Validate project ID
-        if (req.body['project_id'] === undefined || !utils.isValidProjectId(req.body['project_id'])) {
+        if (req.query['id'] === undefined || !utils.isValidProjectId(req.query['id'])) {
             res.status(400).send({success: false, error: 'Missing or wrong project ID.'});
             return;
         }
 
         // Now we need to verify that this project does not have any transactions. So that, only created accidentally
         // or accidentally created and published project can be deleted. If someone pledged a project - it can't be deleted.
-        const transactions = await Transaction.listByProjectId(req.body['project_id']);
+        const transactions = await Transaction.listByProjectId(req.query['id']);
 
         if (transactions.length > 0) {
             res.status(400).send({
@@ -132,7 +132,7 @@ router.route('/delete')
         }
 
         // Delete a project
-        const status = await Project.delete(req.body['project_id']);
+        const status = await Project.delete(req.query['id']);
 
         // Check DB operation for the error
         if (!status) {
@@ -146,11 +146,11 @@ router.route('/delete')
         });
     });
 
-router.route('/list')
+router.route('/admin-list')
     .get(auth, async function (req, res) {
         let projects = await Project.list();
 
-        // Populate response with amount funded
+        // Populate response with funded amount
         projects = await Promise.all(projects.map(async function (project) {
             // Fetch transactions by given project ID
             let transactions = await Transaction.listByProjectId(String(project._id));
@@ -158,8 +158,38 @@ router.route('/list')
             // Count only confirmed transactions
             transactions = transactions.filter(t => t.status === 'confirmed');
 
-            // Update amount funded field
-            project.amount_funded = transactions.reduce((sum, t) => sum + t.amount, 0);
+            // Update funded amount field
+            project.amountFunded = transactions.reduce((sum, t) => sum + t.amount, 0);
+            project.completed = project.amountFunded >= project.amount;
+
+            return project;
+        }));
+
+        // Respond with success and projects list.
+        res.status(200).send({
+            success: true,
+            projects
+        });
+    });
+
+router.route('/list')
+    .get(async function (req, res) {
+        let projects = await Project.list();
+
+        // Filter non-published projects
+        projects = projects.filter(p => p.published);
+
+        // Populate response with funded amount
+        projects = await Promise.all(projects.map(async function (project) {
+            // Fetch transactions by given project ID
+            let transactions = await Transaction.listByProjectId(String(project._id));
+
+            // Count only confirmed transactions
+            transactions = transactions.filter(t => t.status === 'confirmed');
+
+            // Update funded amount field
+            project.amountFunded = transactions.reduce((sum, t) => sum + t.amount, 0);
+            project.completed = project.amountFunded >= project.amount;
 
             return project;
         }));
@@ -174,13 +204,13 @@ router.route('/list')
 router.route('/publish')
     .post(auth, async function (req, res) {
         // Validate project ID
-        if (req.body['project_id'] === undefined || !utils.isValidProjectId(req.body['project_id'])) {
+        if (req.body['id'] === undefined || !utils.isValidProjectId(req.body['id'])) {
             res.status(400).send({success: false, error: 'Missing or wrong project ID.'});
             return;
         }
 
         // Publish project
-        const status = await Project.publish(req.body['project_id']);
+        const status = await Project.publish(req.body['id']);
 
         // Check DB operation for the error
         if (!status) {
@@ -205,13 +235,13 @@ router.route('/upload-image')
 router.route('/button')
     .get(async function (req, res) {
         // Validate project ID
-        if (req.query['project_id'] === undefined || !utils.isValidProjectId(req.query['project_id'])) {
+        if (req.query['id'] === undefined || !utils.isValidProjectId(req.query['id'])) {
             res.status(400).send({success: false, error: 'Missing or wrong project ID.'});
             return;
         }
 
         // Obtain a project from DB
-        const project = await Project.get(req.query['project_id']);
+        const project = await Project.get(req.query['id']);
 
         // Check if project with specified ID exist and published
         if (project === null || !project.published) {
@@ -225,11 +255,11 @@ router.route('/button')
             'amount': '5',
             'currency': 'UAH',
             'description': 'Безповоротна допомога проекту ' + project.name,
-            'order_id': String(project._id) + '-' + uuidv4(),
+            'order_id': req.query['id'] + '-' + uuidv4(),
             'version': '3',
             'server_url': process.env.SERVER_URL + '/api/v1/transactions/liqpay-confirmation'
         });
-        res.status(200).send(button);
+        res.status(200).send({success: true, button});
     });
 
 module.exports = router;

@@ -65,7 +65,7 @@ module.exports.revoke = async function(transactionId) {
     });
 
     // Check the result
-    return response.result.ok === 1 && response.result.nModified === 1;
+    return response.result.ok === 1;
 };
 
 module.exports.reaffirm = async function(transactionId) {
@@ -80,7 +80,7 @@ module.exports.reaffirm = async function(transactionId) {
     });
 
     // Check the result
-    return response.result.ok === 1 && response.result.nModified === 1;
+    return response.result.ok === 1;
 };
 
 module.exports.listByProjectId = async function(projectId) {

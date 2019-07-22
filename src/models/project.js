@@ -81,7 +81,7 @@ module.exports.update = async function (id, name, description, plannedSpendings,
     });
 
     // Check the result
-    return response.result.ok === 1 && response.result.nModified === 1;
+    return response.result.ok === 1;
 };
 
 
@@ -103,7 +103,7 @@ module.exports.publish = async function (id) {
     });
 
     // Check the result
-    return response.result.ok === 1 && response.result.nModified === 1;
+    return response.result.ok === 1;
 };
 
 module.exports.list = async function () {
