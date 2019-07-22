@@ -5,7 +5,7 @@ const {ObjectID} = require("mongodb");
 const db = require('../db');
 const utils = require('../utils');
 
-COLLECTION_NAME = 'projects';
+const COLLECTION_NAME = 'projects';
 
 
 module.exports.create = async function (name) {

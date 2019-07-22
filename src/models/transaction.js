@@ -5,9 +5,9 @@ const {ObjectID} = require("mongodb");
 const db = require('../db');
 const utils = require('../utils');
 
-COLLECTION_NAME = 'transactions';
+const COLLECTION_NAME = 'transactions';
 
-module.exports.create = async function (projectId, type, amount, donatorName, donatorPhone) {
+module.exports.create = async function (projectId, type, amount, donatorName, donatorPhone, paymentId) {
     // Validate project ID
     assert.ok(utils.isValidProjectId(projectId), 'Project ID must be a 24-digit hex string.');
 
@@ -29,13 +29,19 @@ module.exports.create = async function (projectId, type, amount, donatorName, do
         throw 'Wrong donator phone number.';
     }
 
+    // Validate paymentId
+    if (paymentId !== undefined && typeof paymentId !== 'string') {
+        throw 'Payment ID must be a string.';
+    }
+
     // Create transaction entry
     const transaction = {
         projectId: ObjectID(projectId),
-        amount,
+        amount: parseFloat(amount),
         type,
         donatorName,
         donatorPhone,
+        paymentId,
         time: new Date(),
         status: 'confirmed'
     };

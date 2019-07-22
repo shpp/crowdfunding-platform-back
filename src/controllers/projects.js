@@ -1,7 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const multer = require('multer');
-const liqpay = require('../../lib/liqpay');
 const uuidv4 = require('uuid/v4');
 
 const Project = require('../models/project');
@@ -9,11 +8,10 @@ const Transaction = require('../models/transaction');
 const auth = require('../middlewares/auth');
 
 const utils = require('../utils');
+const liqpayClient = require('../liqpay_client');
 
 let router = express.Router();
 router.use(bodyParser.urlencoded({extended: true}));
-
-let liqpayClient = liqpay(process.env.LIQPAY_PUBLIC_KEY, process.env.LIQPAY_PRIVATE_KEY);
 
 const upload = multer({
     storage: process.env.FILE_STORAGE_PATH || 'uploads/',
@@ -150,7 +148,21 @@ router.route('/delete')
 
 router.route('/list')
     .get(auth, async function (req, res) {
-        const projects = await Project.list();
+        let projects = await Project.list();
+
+        // Populate response with amount funded
+        projects = await Promise.all(projects.map(async function (project) {
+            // Fetch transactions by given project ID
+            let transactions = await Transaction.listByProjectId(String(project._id));
+
+            // Count only confirmed transactions
+            transactions = transactions.filter(t => t.status === 'confirmed');
+
+            // Update amount funded field
+            project.amount_funded = transactions.reduce((sum, t) => sum + t.amount, 0);
+
+            return project;
+        }));
 
         // Respond with success and projects list.
         res.status(200).send({
@@ -203,7 +215,7 @@ router.route('/button')
 
         // Check if project with specified ID exist and published
         if (project === null || !project.published) {
-            res.status(500).send({success: false, error: 'The project does not exist.'});
+            res.status(400).send({success: false, error: 'The project does not exist.'});
             return;
         }
 

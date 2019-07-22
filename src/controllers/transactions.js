@@ -6,6 +6,7 @@ const Transaction = require('../models/transaction');
 const auth = require('../middlewares/auth');
 
 const utils = require('../utils');
+const liqpayClient = require('../liqpay_client');
 
 let router = express.Router();
 router.use(bodyParser.urlencoded({extended: true}));
@@ -130,13 +131,44 @@ router.route('/list')
 
 router.route('/liqpay-confirmation')
     .post(async function (req, res) {
-        console.log(typeof req.query.data);
-        console.log(req.query.data);
-        console.log(req.query.signature);
+        // Check data existence
+        if (req.body['data'] !== undefined && typeof req.body['data'] !== 'string') {
+            res.status(400).send({success: false, error: 'Data is not provided.'});
+            return;
+        }
 
-        console.log(typeof req.body.data);
-        console.log(req.body.data);
-        console.log(req.body.signature);
+        // Check signature existence
+        if (req.body['signature'] !== undefined && typeof req.body['signature'] !== 'string') {
+            res.status(400).send({success: false, error: 'Signature is not provided.'});
+            return;
+        }
+
+        // Verify data authority
+        if (!liqpayClient.verify(req.body['data'], req.body['signature'])) {
+            res.status(400).send({success: false, error: 'Wrong signature.'});
+            return;
+        }
+
+        // Convert data to JS object
+        const data = JSON.parse(new Buffer(req.body['data'], 'base64').toString());
+
+        // Skip unsuccessful payments
+        if (data['status'] !== 'success') {
+            res.sendStatus(200);
+            return;
+        }
+
+        // Determine project ID
+        const projectId = data['order_id'].split('-')[0];
+
+        // Create a transaction
+        const transactionId = await Transaction.create(projectId, 'liqpay', data.amount, undefined, undefined, String(data['payment_id']));
+
+        // Respond with 500 code in case of transaction creation failure.
+        if (transactionId === null) {
+            res.status(500).send({success: false, error: 'Try again later.'});
+            return;
+        }
 
         res.sendStatus(200);
     });
