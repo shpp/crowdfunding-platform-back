@@ -28,3 +28,21 @@ module.exports.multerImageFilter = function (req, file, cb) {
     // @TODO
     console.log(file.filename);
 };
+
+module.exports.checkEnvironment = function () {
+    const environmentVariables = [
+        'SERVER_URL',
+        'MONGODB_URI',
+        'LIQPAY_PUBLIC_KEY',
+        'LIQPAY_PRIVATE_KEY',
+        'FILE_STORAGE_PATH',
+        'ADMIN_TOKEN'
+    ];
+
+    environmentVariables.forEach(variableName => {
+        if (process.env[variableName] === undefined || process.env[variableName].length === 0) {
+            console.error(variableName + ' environment variable is not set.');
+            process.exit(-1);
+        }
+    })
+};

@@ -1,6 +1,10 @@
 const express = require('express');
 const logger = require('./log');
 const {projects, transactions} = require('./controllers');
+const utils = require('./utils');
+
+// First of all - check environment variables
+utils.checkEnvironment();
 
 // Create Express app instance
 let app = express();

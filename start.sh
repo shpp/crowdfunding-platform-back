@@ -13,6 +13,8 @@ export LIQPAY_PUBLIC_KEY=""
 export LIQPAY_PRIVATE_KEY=""
 # Path to store binary assets that can't be fitted to DB
 export FILE_STORAGE_PATH=""
+# Admin password token (can be generated with generate_auth_token.js)
+export ADMIN_TOKEN=""
 
 # Run the application
 node app.js
