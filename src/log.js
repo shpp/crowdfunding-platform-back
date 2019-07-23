@@ -10,7 +10,7 @@ const logFormat = printf(info => {
 logger.configure({
     transports: [
         new logger.transports.Console,
-        // new logger.transports.File({filename: 'taxifinder.log'})
+        // new logger.transports.File({filename: 'shpp-crowd-funding-backend.log'})
     ],
     format: combine(
         timestamp(),
