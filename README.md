@@ -1,4 +1,4 @@
-# [shpp] Crowd-funding backend engine
+# [shpp] Crowd-funding backend engine [![Build Status](https://travis-ci.org/shpp/crowdfunding-platform-back.svg?branch=master)](https://travis-ci.org/shpp/crowdfunding-platform-back)
 
 ## Prerequisites & installation
 In order to run application you need to first edit start.sh file and change environment variables values in it to match your actual environment (DB URI, LiqPay keys, etc.) 

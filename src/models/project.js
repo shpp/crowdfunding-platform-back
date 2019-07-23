@@ -69,6 +69,11 @@ module.exports.update = async function (id, name, description, plannedSpendings,
         throw 'Amount must be a non-negative real number.'
     }
 
+    // Check if project exists
+    if (await db.db().collection(COLLECTION_NAME).findOne({_id: ObjectID(id)}) === null) {
+        return false;
+    }
+
     // Update project record
     const response = await db.db().collection(COLLECTION_NAME).updateOne({_id: ObjectID(id)}, {
         $set: {

@@ -7,7 +7,7 @@ export SERVER_URL="https://donate.shpp.me"
 # Specify a port on which server will be listening
 export PORT=80
 # MongoDB database URI
-export MONGODB_URI=""
+export MONGODB_URI="mongodb://localhost:27017/crowdfunding-test"
 # LiqPay API public and private keys
 export LIQPAY_PUBLIC_KEY=""
 export LIQPAY_PRIVATE_KEY=""
