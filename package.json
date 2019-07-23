@@ -4,8 +4,10 @@
   "description": "Node.JS SHPP crowd-funding backend",
   "main": "src/app.js",
   "scripts": {
+    "start": "./start.sh",
     "test": "./test.sh",
-    "start": "./start.sh"
+    "cover": "./cover.sh",
+    "coveralls": "npm run cover -- --report lcovonly && cat ./coverage/lcov.info | coveralls"
   },
   "keywords": [
     "crowdfunding",
@@ -24,6 +26,9 @@
     "winston": "^3.2.1"
   },
   "devDependencies": {
-    "mocha": "^6.1.4"
+    "coveralls": "^3.0.5",
+    "istanbul": "^1.1.0-alpha.1",
+    "mocha": "^6.1.4",
+    "mocha-lcov-reporter": "^1.3.0"
   }
 }
