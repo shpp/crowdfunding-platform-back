@@ -78,7 +78,7 @@ router.route('/update')
         }
 
         // Validate planned spendings
-        if (!utils.isValidAmountString(req.body['amount'])) {
+        if (!utils.isValidAmount(Number(req.body['amount']))) {
             res.status(400).send({success: false, error: 'Missing or wrong amount.'});
             return;
         }

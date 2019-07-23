@@ -17,7 +17,7 @@ module.exports.create = async function (projectId, type, amount, donatorName, do
     }
 
     // Validate amount
-    assert.ok(utils.isValidAmountString(amount), 'Amount must be a positive real number.');
+    assert.ok(utils.isValidAmount(amount), 'Amount must be a positive real number.');
 
     // Validate donator name
     if (donatorName !== undefined && (typeof donatorName !== 'string' || donatorName.length === 0)) {

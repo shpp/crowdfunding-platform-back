@@ -5,4 +5,4 @@ export NODE_ENV="test"
 # MongoDB database URI
 export MONGODB_URI="mongodb://localhost:27017/crowdfunding-test"
 
-istanbul cover _mocha ./test/**/*_test.js
+istanbul cover _mocha -- --recursive

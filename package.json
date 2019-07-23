@@ -4,9 +4,9 @@
   "description": "Node.JS SHPP crowd-funding backend",
   "main": "src/app.js",
   "scripts": {
-    "start": "./start.sh",
-    "test": "./test.sh",
-    "cover": "./cover.sh",
+    "start": "./scripts/start.sh",
+    "test": "./scripts/test.sh",
+    "cover": "./scripts/cover.sh",
     "coveralls": "npm run cover -- --report lcovonly && cat ./coverage/lcov.info | coveralls"
   },
   "keywords": [

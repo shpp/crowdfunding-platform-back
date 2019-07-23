@@ -8,8 +8,7 @@ module.exports.isValidTransactionId = function (transactionId) {
     return typeof transactionId == 'string' && /^[0-9A-F]{24}$/i.test(transactionId);
 };
 
-module.exports.isValidAmountString = function (amount) {
-    amount = Number(amount);
+module.exports.isValidAmount = function (amount) {
     return typeof amount === 'number' && !isNaN(amount) && isFinite(amount) && amount > 0;
 };
 
@@ -29,7 +28,7 @@ module.exports.multerImageFilter = function (req, file, cb) {
     console.log(file.filename);
 };
 
-module.exports.checkEnvironment = function () {
+module.exports.isValidEnvironment = function (environment) {
     const environmentVariables = [
         'SERVER_URL',
         'MONGODB_URI',
@@ -39,10 +38,11 @@ module.exports.checkEnvironment = function () {
         'ADMIN_TOKEN'
     ];
 
-    environmentVariables.forEach(variableName => {
-        if (process.env[variableName] === undefined || process.env[variableName].length === 0) {
-            console.error(variableName + ' environment variable is not set.');
-            process.exit(-1);
+    for (const variableName of environmentVariables) {
+        if (environment[variableName] === undefined || environment[variableName].length === 0) {
+            return false;
         }
-    })
+    }
+
+    return true;
 };

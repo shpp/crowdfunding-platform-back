@@ -27,7 +27,7 @@ router.route('/create')
         }
 
         // Validate amount
-        if (req.body['amount'] === undefined || !utils.isValidAmountString(req.body['amount'])) {
+        if (req.body['amount'] === undefined || !utils.isValidAmount(Number(req.body['amount']))) {
             res.status(400).send({success: false, error: 'Missing or wrong amount.'});
             return;
         }
@@ -45,7 +45,13 @@ router.route('/create')
         }
 
         // Create a transaction
-        const transactionId = await Transaction.create(req.body['project_id'], 'manual', req.body['amount'], req.body['donator_name'], req.body['donator_phone']);
+        const transactionId = await Transaction.create(
+            req.body['project_id'],
+            'manual',
+            Number(req.body['amount']),
+            req.body['donator_name'],
+            req.body['donator_phone']
+        );
 
         // Check DB operation for the error
         if (transactionId === null) {

@@ -31,7 +31,7 @@ describe('Transaction', function () {
     });
 
     it('should not create a transaction with invalid type', async function () {
-        await assert.rejects(transaction.create(testProjectId, 'bitcoin', 0));
+        await assert.rejects(transaction.create(testProjectId, 'bitcoin', 1000));
     });
 
     it('should list all transactions', async function () {

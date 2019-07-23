@@ -4,7 +4,10 @@ const {projects, transactions} = require('./controllers');
 const utils = require('./utils');
 
 // First of all - check environment variables
-utils.checkEnvironment();
+if (!utils.isValidEnvironment(process.env)) {
+    logger.error('Environment variables are not set properly.');
+    process.exit(1);
+}
 
 // Create Express app instance
 let app = express();

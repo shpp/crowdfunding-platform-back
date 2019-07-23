@@ -1,7 +1,7 @@
 # [shpp] Crowd-funding backend engine [![Build Status](https://travis-ci.org/shpp/crowdfunding-platform-back.svg?branch=master)](https://travis-ci.org/shpp/crowdfunding-platform-back) [![Coverage Status](https://coveralls.io/repos/github/shpp/crowdfunding-platform-back/badge.svg?branch=master)](https://coveralls.io/github/shpp/crowdfunding-platform-back?branch=master)
 
 ## Prerequisites & installation
-In order to run application you need to first edit start.sh file and change environment variables values in it to match your actual environment (DB URI, LiqPay keys, etc.) 
+In order to run application you need to first edit scripts/start.sh file and change environment variables values in it to match your actual environment (DB URI, LiqPay keys, etc.) 
 
 ```
 $ npm install
