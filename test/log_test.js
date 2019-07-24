@@ -3,4 +3,8 @@ const assert = require('assert');
 
 const log = require('../src/log');
 
-// TODO: Write tests
+describe('Log', function () {
+    it('should log a string', async function () {
+        log.info("Test log")
+    });
+});

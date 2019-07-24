@@ -22,8 +22,9 @@ describe('Project', function () {
     });
 
     it('should create a project', async function () {
-        assert.strictEqual((await project.create(testProjectName)).constructor.name, 'ObjectID');
-        assert.strictEqual((await project.list())[0].name, testProjectName);
+        const id = await project.create(testProjectName);
+        assert.strictEqual(id.constructor.name, 'ObjectID');
+        assert.strictEqual((await project.get(String(id))).name, testProjectName);
     });
 
     it('should not create project with a wrong name', async function () {
@@ -48,9 +49,20 @@ describe('Project', function () {
 
     it('should publish a project', async function () {
         const projectId = String(await project.create(testProjectName));
-        await assert.doesNotReject(project.publish(projectId));
-        const publishedProject = (await project.list())[0];
+        assert.ok(await project.publish(projectId));
+        const publishedProject = (await project.get(projectId));
         assert.ok(publishedProject.published);
+    });
+
+    it('shouldn\'t publish already published project', async function () {
+        const projectId = String(await project.create(testProjectName));
+        await project.publish(projectId);
+        assert.ok(!(await project.publish(projectId)));
+    });
+
+    it('should delete a project', async function () {
+        const id = await project.create(testProjectName);
+        assert.ok(await project.delete(String(id)));
     });
 
     // Clear DB and close connection after testing
