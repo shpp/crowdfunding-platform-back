@@ -6,7 +6,7 @@
       ],
       "replace": {
         "SERVER_URL=.*": "SERVER_URL='<<BACKURL>>'",
-        "PORT=80": "PORT=<<PORT>>",
+        "PORT=80": "PORT=8080",
         "mongodb://[^/]+": "mongodb://<<MONGOHOSTPORT>>",
         "LIQPAY_PUBLIC_KEY=\"\"": "LIQPAY_PUBLIC_KEY='<<LIQPAY_PUBLIC_KEY>>'",
         "LIQPAY_PRIVATE_KEY=\"\"": "LIQPAY_PRIVATE_KEY='<<LIQPAY_PRIVATE_KEY>>'",
