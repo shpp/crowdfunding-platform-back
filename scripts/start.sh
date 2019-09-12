@@ -17,4 +17,4 @@ export FILE_STORAGE_PATH=""
 export ADMIN_TOKEN=""
 
 # Run the application
-node app.js
+node src/app.js
