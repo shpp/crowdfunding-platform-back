@@ -34,35 +34,33 @@ describe('Project', function () {
     it('should update a project', async function () {
         const projectId = String(await project.create(testProjectName));
         const newName = 'Sony HDR 9000+';
+        const newState = 'published';
         const newAmount = 1000;
-        assert.ok(await project.update(projectId, newName, testProjectDescription, testPlannedSpendings, '', newAmount));
+        assert.ok(await project.update(projectId, newName, newState, testProjectDescription, testPlannedSpendings, '', newAmount));
         const updatedProject = (await project.list())[0];
         assert.strictEqual(updatedProject.name, newName);
+        assert.strictEqual(updatedProject.state, newState);
         assert.strictEqual(updatedProject.description, testProjectDescription);
         assert.strictEqual(updatedProject.plannedSpendings, testPlannedSpendings);
         assert.strictEqual(updatedProject.amount, newAmount);
     });
 
     it('should not update a project that not exist', async function () {
-        assert.strictEqual(await project.update('5cd405cbf747eb3e79e63298', testProjectName, testProjectDescription, testPlannedSpendings, testPlannedSpendings, 1000), false);
+        assert.strictEqual(await project.update('5cd405cbf747eb3e79e63298', testProjectName, 'unpublished', testProjectDescription, testPlannedSpendings, testPlannedSpendings, 1000), false);
     });
 
     it('should publish a project', async function () {
         const projectId = String(await project.create(testProjectName));
-        assert.ok(await project.publish(projectId));
+        assert.ok(await project.update(projectId, testProjectName, 'published', testProjectDescription, testPlannedSpendings, testPlannedSpendings, 1000), false);
         const publishedProject = (await project.get(projectId));
-        assert.ok(publishedProject.published);
+        assert.strictEqual(publishedProject.state, 'published');
     });
 
-    it('shouldn\'t publish already published project', async function () {
+    it('should archive a project', async function () {
         const projectId = String(await project.create(testProjectName));
-        await project.publish(projectId);
-        assert.ok(!(await project.publish(projectId)));
-    });
-
-    it('should delete a project', async function () {
-        const id = await project.create(testProjectName);
-        assert.ok(await project.delete(String(id)));
+        assert.ok(await project.update(projectId, testProjectName, 'archived', testProjectDescription, testPlannedSpendings, testPlannedSpendings, 1000), false);
+        const publishedProject = (await project.get(projectId));
+        assert.strictEqual(publishedProject.state, 'archived');
     });
 
     // Clear DB and close connection after testing

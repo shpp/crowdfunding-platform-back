@@ -17,13 +17,13 @@ module.exports.create = async function (name) {
     // Create project
     const project = {
         name,
+        state: 'unpublished',
         description: '',
         plannedSpendings: '',
         actualSpendings: '',
         amount: 0,
         currency: 'UAH',
-        creationTime: new Date(),
-        published: false
+        creationTime: new Date()
     };
 
     // Save project record to DB
@@ -40,13 +40,18 @@ module.exports.get = async function (id) {
     return await db.db().collection(COLLECTION_NAME).findOne({_id: ObjectID(id)});
 };
 
-module.exports.update = async function (id, name, description, plannedSpendings, actualSpendings, amount) {
+module.exports.update = async function (id, name, state, description, plannedSpendings, actualSpendings, amount) {
     // Validate ID
     assert.ok(utils.isValidProjectId(id), 'Project ID must be a 24-digit hex string.');
 
     // Validate name
     if (typeof name !== 'string' || name.length === 0) {
         throw 'Name must be a string with length > 0.'
+    }
+
+    // Validate state
+    if (typeof state !== 'string' || !(['unpublished', 'published', 'archived'].includes(state))) {
+        throw 'State must be one of the following: [\'unpublished\', \'published\', \'archived\'].'
     }
 
     // Validate description
@@ -78,6 +83,7 @@ module.exports.update = async function (id, name, description, plannedSpendings,
     const response = await db.db().collection(COLLECTION_NAME).updateOne({_id: ObjectID(id)}, {
         $set: {
             name,
+            state,
             description,
             plannedSpendings,
             actualSpendings,
@@ -89,38 +95,6 @@ module.exports.update = async function (id, name, description, plannedSpendings,
     return response.result.ok === 1;
 };
 
-
-module.exports.publish = async function (id) {
-    // Validate ID
-    assert.ok(utils.isValidProjectId(id), 'Project ID must be a 24-digit hex string.');
-
-    const project = await db.db().collection(COLLECTION_NAME).findOne({_id: ObjectID(id)});
-
-    if (project === null || project.published) {
-        return false;
-    }
-
-    // Update project record
-    const response = await db.db().collection(COLLECTION_NAME).updateOne({_id: ObjectID(id)}, {
-        $set: {
-            published: true
-        }
-    });
-
-    // Check the result
-    return response.result.ok === 1;
-};
-
 module.exports.list = async function () {
     return (await db.db().collection(COLLECTION_NAME).find({}).toArray());
-};
-
-module.exports.delete = async function (id) {
-    // Validate ID
-    assert.ok(utils.isValidProjectId(id), 'Project ID must be a 24-digit hex string.');
-
-    const response = await db.db().collection(COLLECTION_NAME).deleteOne({_id: ObjectID(id)});
-
-    // Check the result
-    return response.result.ok === 1 && response.deletedCount === 1;
 };

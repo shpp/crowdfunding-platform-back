@@ -14,6 +14,7 @@ module.exports.init = async function (url) {
 
     // Connect to MongoDB
     client = await MongoClient.connect(url, {
+        useUnifiedTopology: true,
         useNewUrlParser: true
     });
 

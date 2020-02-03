@@ -29,7 +29,7 @@ router.route('/create')
             return;
         }
 
-        // Create a transaction
+        // Create a project
         const projectId = await Project.create(req.body['name']);
 
         // Check DB operation for the error
@@ -56,6 +56,15 @@ router.route('/update')
         // Validate project name
         if (req.body['name'] === undefined || typeof req.body['name'] !== 'string' || req.body['name'].length === 0) {
             res.status(400).send({success: false, error: 'Missing or wrong project name.'});
+            return;
+        }
+
+        // Validate project state
+        if (req.body['state'] === undefined ||
+            typeof req.body['state'] !== 'string' ||
+            !(['unpublished', 'published', 'archived'].includes(req.body['state']))
+        ) {
+            res.status(400).send({success: false, error: 'Missing or wrong project state. State must be one of the following: [\'unpublished\', \'published\', \'archived\']'});
             return;
         }
 
@@ -93,6 +102,7 @@ router.route('/update')
         const status = await Project.update(
             req.body['id'],
             req.body['name'],
+            req.body['state'],
             req.body['description'],
             req.body['planned_spendings'],
             req.body['actual_spendings'],
@@ -111,41 +121,6 @@ router.route('/update')
         });
     });
 
-router.route('/delete')
-    .delete(auth, async function (req, res) {
-        // Validate project ID
-        if (req.query['id'] === undefined || !utils.isValidProjectId(req.query['id'])) {
-            res.status(400).send({success: false, error: 'Missing or wrong project ID.'});
-            return;
-        }
-
-        // Now we need to verify that this project does not have any transactions. So that, only created accidentally
-        // or accidentally created and published project can be deleted. If someone pledged a project - it can't be deleted.
-        const transactions = await Transaction.listByProjectId(req.query['id']);
-
-        if (transactions.length > 0) {
-            res.status(400).send({
-                success: false,
-                error: 'Operation can\'t be performed, as this project already has some transactions.'
-            });
-            return;
-        }
-
-        // Delete a project
-        const status = await Project.delete(req.query['id']);
-
-        // Check DB operation for the error
-        if (!status) {
-            res.status(500).send({success: false, error: 'Operation can\'t be performed. Please, try again later.'});
-            return;
-        }
-
-        // Respond with success and transaction ID.
-        res.status(200).send({
-            success: true
-        });
-    });
-
 router.route('/admin-list')
     .get(auth, async function (req, res) {
         let projects = await Project.list();
@@ -158,7 +133,7 @@ router.route('/admin-list')
             // Count only confirmed transactions
             transactions = transactions.filter(t => t.status === 'confirmed');
 
-            // Update funded amount field
+            // Add dynamically calculated properties
             project.amountFunded = transactions.reduce((sum, t) => sum + t.amount, 0);
             project.completed = project.amountFunded >= project.amount;
 
@@ -176,8 +151,8 @@ router.route('/list')
     .get(async function (req, res) {
         let projects = await Project.list();
 
-        // Filter non-published projects
-        projects = projects.filter(p => p.published);
+        // Select only published projects
+        projects = projects.filter(p => p.state === 'published');
 
         // Populate response with funded amount
         projects = await Promise.all(projects.map(async function (project) {
@@ -187,7 +162,7 @@ router.route('/list')
             // Count only confirmed transactions
             transactions = transactions.filter(t => t.status === 'confirmed');
 
-            // Update funded amount field
+            // Add dynamically calculated properties
             project.amountFunded = transactions.reduce((sum, t) => sum + t.amount, 0);
             project.completed = project.amountFunded >= project.amount;
 
@@ -198,29 +173,6 @@ router.route('/list')
         res.status(200).send({
             success: true,
             projects
-        });
-    });
-
-router.route('/publish')
-    .post(auth, async function (req, res) {
-        // Validate project ID
-        if (req.body['id'] === undefined || !utils.isValidProjectId(req.body['id'])) {
-            res.status(400).send({success: false, error: 'Missing or wrong project ID.'});
-            return;
-        }
-
-        // Publish project
-        const status = await Project.publish(req.body['id']);
-
-        // Check DB operation for the error
-        if (!status) {
-            res.status(500).send({success: false, error: 'Operation can\'t be performed. Please, try again later.'});
-            return;
-        }
-
-        // Respond with success and transaction ID.
-        res.status(200).send({
-            success: true
         });
     });
 
@@ -244,7 +196,7 @@ router.route('/button')
         const project = await Project.get(req.query['id']);
 
         // Check if project with specified ID exist and published
-        if (project === null || !project.published) {
+        if (project === null || project.state !== 'published') {
             res.status(400).send({success: false, error: 'The project does not exist.'});
             return;
         }
