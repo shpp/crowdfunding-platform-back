@@ -15,7 +15,7 @@ module.exports = async function (req, res, next) {
     const token = req.headers.authorization.split(' ')[1];
 
     if (token !== process.env.ADMIN_TOKEN) {
-        res.status(500).send('Token is wrong.');
+        res.status(401).send('Token is wrong.');
         return;
     }
 
