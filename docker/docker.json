@@ -1,0 +1,11 @@
+{
+  "from": "fi-fo-nginx-node",
+  "volumes": [
+     "storage:/storage:rw",
+     "assets:/assets:rw"
+  ],
+  "cacheable-environment": [
+    "package.json",
+    "package-lock.json"
+  ]
+}
