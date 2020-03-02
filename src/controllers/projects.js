@@ -118,9 +118,9 @@ router.route('/update')
             req.body['description'],
             req.body['plannedSpendings'],
             req.body['actualSpendings'],
-            req.body['createdAtTS'],
             req.body['image'],
-            Number(req.body['amount'])
+            Number(req.body['amount']),
+            req.body['createdAtTS'],
         );
 
         // Check DB operation for the error
