@@ -48,7 +48,7 @@ router.route('/create')
 router.route('/update')
     .post(auth, async function (req, res) {
         // Validate project ID
-        if (req.body['id'] === undefined || !utils.isValidProjectId(req.body['id'])) {
+        if (req.body['_id'] === undefined || !utils.isValidProjectId(req.body['_id'])) {
             res.status(400).send({success: false, error: 'Missing or wrong project ID.'});
             return;
         }
@@ -75,13 +75,13 @@ router.route('/update')
         }
 
         // Validate planned spendings
-        if (req.body['planned_spendings'] === undefined || typeof req.body['planned_spendings'] !== 'string' || req.body['planned_spendings'].length === 0) {
+        if (req.body['plannedSpendings'] === undefined || typeof req.body['plannedSpendings'] !== 'string' || req.body['plannedSpendings'].length === 0) {
             res.status(400).send({success: false, error: 'Missing or wrong planned spendings.'});
             return;
         }
 
         // Validate planned spendings
-        if (req.body['actual_spendings'] === undefined || typeof req.body['actual_spendings'] !== 'string') {
+        if (req.body['actualSpendings'] === undefined || typeof req.body['actualSpendings'] !== 'string') {
             res.status(400).send({success: false, error: 'Missing or wrong actual spendings.'});
             return;
         }
@@ -105,12 +105,12 @@ router.route('/update')
 
         // Update a project with new data
         const status = await Project.update(
-            req.body['id'],
+            req.body['_id'],
             req.body['name'],
             req.body['state'],
             req.body['description'],
-            req.body['planned_spendings'],
-            req.body['actual_spendings'],
+            req.body['plannedSpendings'],
+            req.body['actualSpendings'],
             req.body['image'],
             Number(req.body['amount'])
         );
