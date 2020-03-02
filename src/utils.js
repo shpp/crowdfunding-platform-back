@@ -16,6 +16,10 @@ module.exports.isValidPhoneNumber = function (phoneNumber) {
     return typeof phoneNumber == 'string' && /^\+?\d{10,12}$/.test(phoneNumber);
 };
 
+module.exports.isValidTimestamp = function (ts) {
+    return typeof ts == 'number' && ts > 0;
+};
+
 module.exports.isValidUrl = function (url) {
     return typeof url == 'string' && /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=]+$/.test(url);
 };
