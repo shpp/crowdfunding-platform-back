@@ -13,7 +13,11 @@ module.exports.isValidAmount = function (amount) {
 };
 
 module.exports.isValidPhoneNumber = function (phoneNumber) {
-    return typeof phoneNumber == 'string' && /^\+\d{12}$/.test(phoneNumber);
+    return typeof phoneNumber == 'string' && /^\+?\d{10,12}$/.test(phoneNumber);
+};
+
+module.exports.isValidUrl = function (url) {
+    return typeof url == 'string' && /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=]+$/.test(url);
 };
 
 module.exports.multerImageFilter = function (req, file, cb) {

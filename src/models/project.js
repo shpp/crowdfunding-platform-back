@@ -69,6 +69,10 @@ module.exports.update = async function (id, name, state, description, plannedSpe
     if (typeof actualSpendings !== 'string') {
         throw 'Actual spendings must be a string.'
     }
+    // Validate actualSpendings
+    if (typeof image !== 'string') {
+        throw 'Image must be a string (URL).'
+    }
 
     // Validate amount
     if (typeof amount !== 'number' || isNaN(amount) || !isFinite(amount) || amount < 0) {

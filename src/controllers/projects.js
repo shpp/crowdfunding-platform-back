@@ -85,6 +85,11 @@ router.route('/update')
             res.status(400).send({success: false, error: 'Missing or wrong actual spendings.'});
             return;
         }
+        // Validate planned spendings
+        if (!utils.isValidUrl(req.body['image'])) {
+            res.status(400).send({success: false, error: 'Missing or wrong cover image.'});
+            return;
+        }
 
         // Validate planned spendings
         if (!utils.isValidAmount(Number(req.body['amount']))) {
