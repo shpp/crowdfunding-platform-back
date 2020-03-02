@@ -99,7 +99,7 @@ router.route('/update')
         }
 
         // Validate creation time
-        if (!utils.isValidTimestamp(req.body['createdAtTS'])) {
+        if (!utils.isValidTimestamp(Number(req.body['createdAtTS']))) {
             res.status(400).send({success: false, error: 'Missing or wrong creation time.'});
             return;
         }
