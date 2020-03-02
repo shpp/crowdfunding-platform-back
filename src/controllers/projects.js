@@ -106,6 +106,7 @@ router.route('/update')
             req.body['description'],
             req.body['planned_spendings'],
             req.body['actual_spendings'],
+            req.body['image'],
             Number(req.body['amount'])
         );
 
