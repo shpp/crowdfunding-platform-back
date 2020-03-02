@@ -24,7 +24,7 @@ module.exports.create = async function (name) {
         image: '',
         amount: 0,
         currency: 'UAH',
-        creationTime: new Date()
+        createdAtTS: +new Date()
     };
 
     // Save project record to DB
@@ -41,7 +41,7 @@ module.exports.get = async function (id) {
     return await db.db().collection(COLLECTION_NAME).findOne({_id: ObjectID(id)});
 };
 
-module.exports.update = async function (id, name, state, description, plannedSpendings, actualSpendings, image, amount) {
+module.exports.update = async function (id, name, state, description, plannedSpendings, actualSpendings, image, amount, createdAtTS) {
     // Validate ID
     assert.ok(utils.isValidProjectId(id), 'Project ID must be a 24-digit hex string.');
 
@@ -69,7 +69,7 @@ module.exports.update = async function (id, name, state, description, plannedSpe
     if (typeof actualSpendings !== 'string') {
         throw 'Actual spendings must be a string.'
     }
-    // Validate actualSpendings
+    // Validate cover image
     if (typeof image !== 'string') {
         throw 'Image must be a string (URL).'
     }
@@ -93,7 +93,8 @@ module.exports.update = async function (id, name, state, description, plannedSpe
             plannedSpendings,
             actualSpendings,
             image,
-            amount
+            amount,
+            createdAtTS
         }
     });
 

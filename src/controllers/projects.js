@@ -80,20 +80,27 @@ router.route('/update')
             return;
         }
 
-        // Validate planned spendings
+        // Validate actual spendings
         if (req.body['actualSpendings'] === undefined || typeof req.body['actualSpendings'] !== 'string') {
             res.status(400).send({success: false, error: 'Missing or wrong actual spendings.'});
             return;
         }
-        // Validate planned spendings
+
+        // Validate cover image
         if (!utils.isValidUrl(req.body['image'])) {
             res.status(400).send({success: false, error: 'Missing or wrong cover image.'});
             return;
         }
 
-        // Validate planned spendings
+        // Validate amount
         if (!utils.isValidAmount(Number(req.body['amount']))) {
             res.status(400).send({success: false, error: 'Missing or wrong amount.'});
+            return;
+        }
+
+        // Validate creation time
+        if (!utils.isValidTimestamp(req.body['createdAtTS'])) {
+            res.status(400).send({success: false, error: 'Missing or wrong creation time.'});
             return;
         }
 
@@ -111,6 +118,7 @@ router.route('/update')
             req.body['description'],
             req.body['plannedSpendings'],
             req.body['actualSpendings'],
+            req.body['createdAtTS'],
             req.body['image'],
             Number(req.body['amount'])
         );
