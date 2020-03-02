@@ -205,9 +205,9 @@ router.route('/button')
         // Generate LiqPay button
         const button = liqpayClient.cnb_form({
             'action': 'paydonate',
-            'amount': '5',
+            'amount': '50',
             'currency': 'UAH',
-            'description': 'Безповоротна допомога проекту ' + project.name,
+            'description': 'Безповоротна допомога проекту "' + project.name + '"',
             'order_id': req.query['id'] + '-' + uuidv4(),
             'version': '3',
             'server_url': process.env.SERVER_URL + '/api/v1/transactions/liqpay-confirmation'
