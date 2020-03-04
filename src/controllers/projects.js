@@ -177,6 +177,7 @@ router.route('/list')
             transactions = transactions.filter(t => t.status === 'confirmed');
 
             // Add dynamically calculated properties
+            project.bakers = transactions.length;
             project.amountFunded = transactions.reduce((sum, t) => sum + t.amount, 0);
             project.completed = project.amountFunded >= project.amount;
 
