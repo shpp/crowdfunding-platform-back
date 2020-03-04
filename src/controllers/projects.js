@@ -219,7 +219,7 @@ router.route('/button')
         // Generate LiqPay button
         const button = liqpayClient.cnb_form({
             'action': 'paydonate',
-            'amount': '50',
+            'amount': '300',
             'currency': 'UAH',
             'description': 'Безповоротна допомога проекту "' + project.name + '"',
             'order_id': req.query['id'] + '-' + uuidv4(),
