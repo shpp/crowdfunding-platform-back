@@ -74,6 +74,12 @@ router.route('/update')
             return;
         }
 
+        // Validate project's short description
+        if (req.body['shortDescription'] === undefined || typeof req.body['shortDescription'] !== 'string' || req.body['shortDescription'].length === 0) {
+            res.status(400).send({success: false, error: 'Missing or wrong project short description.'});
+            return;
+        }
+
         // Validate planned spendings
         if (req.body['plannedSpendings'] === undefined || typeof req.body['plannedSpendings'] !== 'string' || req.body['plannedSpendings'].length === 0) {
             res.status(400).send({success: false, error: 'Missing or wrong planned spendings.'});
@@ -111,17 +117,7 @@ router.route('/update')
         }
 
         // Update a project with new data
-        const status = await Project.update(
-            req.body['_id'],
-            req.body['name'],
-            req.body['state'],
-            req.body['description'],
-            req.body['plannedSpendings'],
-            req.body['actualSpendings'],
-            req.body['image'],
-            Number(req.body['amount']),
-            req.body['createdAtTS'],
-        );
+        const status = await Project.update(req.body);
 
         // Check DB operation for the error
         if (!status) {
