@@ -7,7 +7,7 @@
       "replace": {
         "SERVER_URL=[^\n]+": "SERVER_URL='<<BACKURL>>'",
         "PORT=80": "PORT=8080",
-        "mongodb://[^/]+": "mongodb://<<MONGOHOSTPORT>>",
+        "mongodb://[^/]+": "mongodb://<<MONGOUSER>>:<<MONGOPASS>>@<<MONGOHOSTPORT>>",
         "LIQPAY_PUBLIC_KEY=\"\"": "LIQPAY_PUBLIC_KEY='<<LIQPAY_PUBLIC_KEY>>'",
         "LIQPAY_PRIVATE_KEY=\"\"": "LIQPAY_PRIVATE_KEY='<<LIQPAY_PRIVATE_KEY>>'",
         "FILE_STORAGE_PATH=\"\"": "FILE_STORAGE_PATH=/assets",
