@@ -23,7 +23,7 @@ app.use('/api/v1/transactions', transactions);
 app.use('/static', express.static(process.env.FILE_STORAGE_PATH || 'uploads'));
 
 // Initialize DB
-require('./db').init(process.env.MONGODB_URI).then(() => {
+require('./db').init(process.env.MONGODB_URI + "?authSource=admin&authMechanism=DEFAULT").then(() => {
     logger.info('Successfully connected to the database.');
 
     // Listen server
