@@ -5,9 +5,10 @@ const uuidv4 = require('uuid/v4');
 const Project = require('../models/project');
 const Transaction = require('../models/transaction');
 const auth = require('../middlewares/auth');
-
+const logger = require('../log');
 const utils = require('../utils');
 const liqpayClient = require('../liqpay_client');
+const {sendResponse} = utils;
 
 let router = express.Router();
 
@@ -20,10 +21,10 @@ const upload = multer({
 });
 
 router.route('/create')
-    .post(auth, async function (req, res) {
+    .post(auth, async function (req, res, next) {
         // Validate project name
         if (typeof req.body['name'] !== 'string' || req.body['name'].length === 0) {
-            res.status(400).send({success: false, error: 'Missing or wrong project name.'});
+            sendResponse(res, 400, {error: 'Missing or wrong project name.'});
             return;
         }
 
@@ -32,28 +33,25 @@ router.route('/create')
 
         // Check DB operation for the error
         if (projectId === null) {
-            res.status(500).send({success: false, error: 'Operation can\'t be performed. Please, try again later.'});
+            sendResponse(res, 500, {error: 'Operation can\'t be performed. Please, try again later.'});
             return;
         }
 
         // Respond with success and transaction ID.
-        res.status(200).send({
-            success: true,
-            project_id: projectId
-        });
+        sendResponse(res, 200, {project_id: projectId});
     });
 
 router.route('/update')
     .post(auth, async function (req, res) {
         // Validate project ID
         if (req.body['_id'] === undefined || !utils.isValidProjectId(req.body['_id'])) {
-            res.status(400).send({success: false, error: 'Missing or wrong project ID.'});
+            sendResponse(res, 400, {error: 'Missing or wrong project ID.'});
             return;
         }
 
         // Validate project name
         if (req.body['name'] === undefined || typeof req.body['name'] !== 'string' || req.body['name'].length === 0) {
-            res.status(400).send({success: false, error: 'Missing or wrong project name.'});
+            sendResponse(res, 400, {error: 'Missing or wrong project name.'});
             return;
         }
 
@@ -62,55 +60,55 @@ router.route('/update')
             typeof req.body['state'] !== 'string' ||
             !(['unpublished', 'published', 'archived'].includes(req.body['state']))
         ) {
-            res.status(400).send({success: false, error: 'Missing or wrong project state. State must be one of the following: [\'unpublished\', \'published\', \'archived\']'});
+            sendResponse(res, 400, {error: 'Missing or wrong project state. State must be one of the following: [\'unpublished\', \'published\', \'archived\']'});
             return;
         }
 
         // Validate project description
         if (req.body['description'] === undefined || typeof req.body['description'] !== 'string' || req.body['description'].length === 0) {
-            res.status(400).send({success: false, error: 'Missing or wrong project description.'});
+            sendResponse(res, 400, {error: 'Missing or wrong project description.'});
             return;
         }
 
         // Validate project's short description
         if (req.body['shortDescription'] === undefined || typeof req.body['shortDescription'] !== 'string' || req.body['shortDescription'].length === 0) {
-            res.status(400).send({success: false, error: 'Missing or wrong project short description.'});
+            sendResponse(res, 400, {error: 'Missing or wrong project short description.'});
             return;
         }
 
         // Validate planned spendings
         if (req.body['plannedSpendings'] === undefined || typeof req.body['plannedSpendings'] !== 'string' || req.body['plannedSpendings'].length === 0) {
-            res.status(400).send({success: false, error: 'Missing or wrong planned spendings.'});
+            sendResponse(res, 400, {error: 'Missing or wrong planned spendings.'});
             return;
         }
 
         // Validate actual spendings
         if (req.body['actualSpendings'] === undefined || typeof req.body['actualSpendings'] !== 'string') {
-            res.status(400).send({success: false, error: 'Missing or wrong actual spendings.'});
+            sendResponse(res, 400, {error: 'Missing or wrong actual spendings.'});
             return;
         }
 
         // Validate cover image
         if (!utils.isValidUrl(req.body['image'])) {
-            res.status(400).send({success: false, error: 'Missing or wrong cover image.'});
+            sendResponse(res, 400, {error: 'Missing or wrong cover image.'});
             return;
         }
 
         // Validate amount
         if (!utils.isValidAmount(Number(req.body['amount']))) {
-            res.status(400).send({success: false, error: 'Missing or wrong amount.'});
+            sendResponse(res, 400, {error: 'Missing or wrong amount.'});
             return;
         }
 
         // Validate creation time
         if (!utils.isValidTimestamp(Number(req.body['createdAtTS']))) {
-            res.status(400).send({success: false, error: 'Missing or wrong creation time.'});
+            sendResponse(res, 400, {error: 'Missing or wrong creation time.'});
             return;
         }
 
         // Validate currency
         if (req.body['currency'] !== 'UAH') {
-            res.status(400).send({success: false, error: 'Missing or wrong currency.'});
+            sendResponse(res, 400, {error: 'Missing or wrong currency.'});
             return;
         }
 
@@ -119,14 +117,12 @@ router.route('/update')
 
         // Check DB operation for the error
         if (!status) {
-            res.status(500).send({success: false, error: 'Operation can\'t be performed. Please, try again later.'});
+            sendResponse(res, 500, {error: 'Operation can\'t be performed. Please, try again later.'});
             return;
         }
 
         // Respond with success.
-        res.status(200).send({
-            success: true
-        });
+        sendResponse(res, 200);
     });
 
 router.route('/admin-list')
@@ -149,10 +145,7 @@ router.route('/admin-list')
         }));
 
         // Respond with success and projects list.
-        res.status(200).send({
-            success: true,
-            projects
-        });
+        sendResponse(res, 200, {projects});
     });
 
 router.route('/list')
@@ -179,25 +172,20 @@ router.route('/list')
         }));
 
         // Respond with success and projects list.
-        res.status(200).send({
-            success: true,
-            projects
-        });
+        sendResponse(res, 200, {projects});
     });
 
 router.route('/upload-image')
     .post(auth, upload.single('image'), async function (req, res) {
         // Respond with success.
-        res.status(200).send({
-            success: true
-        });
+        sendResponse(res, 200);
     });
 
 router.route('/button')
     .get(async function (req, res) {
         // Validate project ID
         if (req.query['id'] === undefined || !utils.isValidProjectId(req.query['id'])) {
-            res.status(400).send({success: false, error: 'Missing or wrong project ID.'});
+            sendResponse(res, 400, {error: 'Missing or wrong project ID.'});
             return;
         }
 
@@ -206,7 +194,7 @@ router.route('/button')
 
         // Check if project with specified ID exist and published
         if (project === null || project.state !== 'published') {
-            res.status(400).send({success: false, error: 'The project does not exist.'});
+            sendResponse(res, 400, {error: 'The project does not exist.'});
             return;
         }
 
@@ -220,7 +208,7 @@ router.route('/button')
             'version': '3',
             'server_url': process.env.SERVER_URL + '/api/v1/transactions/liqpay-confirmation'
         });
-        res.status(200).send({success: true, button});
+        sendResponse(res, 200, {button});
     });
 
 module.exports = router;

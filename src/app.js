@@ -25,6 +25,8 @@ app.use('/api/v1/transactions', transactions);
 // Set up static route for images
 app.use('/static', express.static(process.env.FILE_STORAGE_PATH || 'uploads'));
 
+app.use(sendResponse);
+
 // Initialize DB
 require('./db').init(process.env.MONGODB_URI + "?authSource=admin&authMechanism=DEFAULT").then(() => {
     logger.info('Successfully connected to the database.');

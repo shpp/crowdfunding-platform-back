@@ -54,3 +54,17 @@ module.exports.isValidEnvironment = function (environment) {
 
     return true;
 };
+module.exports.sendResponse = (res, code, data) => {
+    logger.info(`[response] ${code} ${JSON.stringify(data)}`);
+    if (code === 200) {
+        res.status(200).send({
+            ...data,
+            success: true
+        });
+    } else {
+        res.status(code).send({
+            ...data,
+            success: false
+        })
+    }
+};

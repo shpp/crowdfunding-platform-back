@@ -1,5 +1,4 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 
 const Project = require('../models/project');
 const Transaction = require('../models/transaction');
@@ -7,40 +6,40 @@ const auth = require('../middlewares/auth');
 
 const utils = require('../utils');
 const liqpayClient = require('../liqpay_client');
+const {sendResponse} = utils;
 
 let router = express.Router();
-router.use(bodyParser.urlencoded({extended: true}));
 
 router.route('/create')
     .post(auth, async function (req, res) {
         // Validate project ID
         if (req.body['project_id'] === undefined || !utils.isValidProjectId(req.body['project_id'])) {
-            res.status(400).send({success: false, error: 'Missing or wrong project ID.'});
+            sendResponse(res, 400, {error: 'Missing or wrong project ID.'});
             return;
         }
 
         // Check if project with given ID exists.
         let project = await Project.get(req.body['project_id']);
         if (project === null) {
-            res.status(400).send({success: false, error: 'Project with given ID can\'t be found.'});
+            sendResponse(res, 400, {error: 'Project with given ID can\'t be found.'});
             return;
         }
 
         // Validate amount
         if (req.body['amount'] === undefined || !utils.isValidAmount(Number(req.body['amount']))) {
-            res.status(400).send({success: false, error: 'Missing or wrong amount.'});
+            sendResponse(res, 400, {error: 'Missing or wrong amount.'});
             return;
         }
 
         // Validate donator name
         if (req.body['donator_name'] !== undefined && req.body['donator_name'].length === 0) {
-            res.status(400).send({success: false, error: 'Empty donator name.'});
+            sendResponse(res, 400, {error: 'Empty donator name.'});
             return;
         }
 
         // Validate donator phone
         if (req.body['donator_phone'] !== undefined && !utils.isValidPhoneNumber(req.body['donator_phone'])) {
-            res.status(400).send({success: false, error: 'Wrong phone number format.'});
+            sendResponse(res, 400, {error: 'Wrong phone number format.'});
             return;
         }
 
@@ -55,22 +54,19 @@ router.route('/create')
 
         // Check DB operation for the error
         if (transactionId === null) {
-            res.status(500).send({success: false, error: 'Operation can\'t be performed. Please, try again later.'});
+            sendResponse(res, 500, {error: 'Operation can\'t be performed. Please, try again later.'});
             return;
         }
 
         // Respond with success and transaction ID.
-        res.status(200).send({
-            success: true,
-            transaction_id: transactionId
-        });
+        sendResponse(res, 200, {transaction_id: transactionId});
     });
 
 router.route('/revoke')
     .post(auth, async function (req, res) {
         // Validate transaction ID
         if (req.body['id'] === undefined || !utils.isValidTransactionId(req.body['id'])) {
-            res.status(400).send({success: false, error: 'Missing or wrong transaction ID.'});
+            sendResponse(res, 400, {error: 'Missing or wrong transaction ID.'});
             return;
         }
 
@@ -79,21 +75,19 @@ router.route('/revoke')
 
         // Check DB operation for the error
         if (!status) {
-            res.status(500).send({success: false, error: 'Operation can\'t be performed. Please, try again later.'});
+            sendResponse(res, 500, {error: 'Operation can\'t be performed. Please, try again later.'});
             return;
         }
 
         // Respond with success and transaction ID.
-        res.status(200).send({
-            success: true
-        });
+        sendResponse(res, 200);
     });
 
 router.route('/reaffirm')
     .post(auth, async function (req, res) {
         // Validate transaction ID
         if (req.body['id'] === undefined || !utils.isValidTransactionId(req.body['id'])) {
-            res.status(400).send({success: false, error: 'Missing or wrong transaction ID.'});
+            sendResponse(res, 400, {error: 'Missing or wrong transaction ID.'});
             return;
         }
 
@@ -102,21 +96,19 @@ router.route('/reaffirm')
 
         // Check DB operation for the error
         if (!status) {
-            res.status(500).send({success: false, error: 'Operation can\'t be performed. Please, try again later.'});
+            sendResponse(res, 500, {error: 'Operation can\'t be performed. Please, try again later.'});
             return;
         }
 
         // Respond with success and transaction ID.
-        res.status(200).send({
-            success: true
-        });
+        sendResponse(res, 200);
     });
 
 router.route('/list')
     .get(auth, async function (req, res) {
         // Validate project ID
         if (req.query['project_id'] !== undefined && !utils.isValidProjectId(req.query['project_id'])) {
-            res.status(400).send({success: false, error: 'Wrong project ID.'});
+            sendResponse(res, 400, {error: 'Wrong project ID.'});
             return;
         }
 
@@ -129,29 +121,26 @@ router.route('/list')
         }
 
         // Respond with success and transactions list.
-        res.status(200).send({
-            success: true,
-            transactions
-        });
+        sendResponse(res, 200, {transactions});
     });
 
 router.route('/liqpay-confirmation')
     .post(async function (req, res) {
         // Check data existence
         if (req.body['data'] !== undefined && typeof req.body['data'] !== 'string') {
-            res.status(400).send({success: false, error: 'Data is not provided.'});
+            sendResponse(res, 400, {error: 'Data is not provided.'});
             return;
         }
 
         // Check signature existence
         if (req.body['signature'] !== undefined && typeof req.body['signature'] !== 'string') {
-            res.status(400).send({success: false, error: 'Signature is not provided.'});
+            sendResponse(res, 400, {error: 'Signature is not provided.'});
             return;
         }
 
         // Verify data authority
         if (!liqpayClient.verify(req.body['data'], req.body['signature'])) {
-            res.status(400).send({success: false, error: 'Wrong signature.'});
+            sendResponse(res, 400, {error: 'Wrong signature.'});
             return;
         }
 
@@ -159,8 +148,8 @@ router.route('/liqpay-confirmation')
         const data = JSON.parse(Buffer.from(req.body['data'], 'base64').toString());
 
         // Skip unsuccessful payments
-        if (data['status'] !== 'success') {
-            res.sendStatus(200);
+        if (!['success', 'wait_accept'].includes(data['status'])) {
+            sendResponse(res, 200, {error: 'wrong status: ' + data['status']});
             return;
         }
 
@@ -172,11 +161,11 @@ router.route('/liqpay-confirmation')
 
         // Respond with 500 code in case of transaction creation failure.
         if (transactionId === null) {
-            res.status(500).send({success: false, error: 'Try again later.'});
+            sendResponse(res, 500, {error: 'Try again later.'});
             return;
         }
 
-        res.sendStatus(200);
+        sendResponse(res, 200);
     });
 
 module.exports = router;
