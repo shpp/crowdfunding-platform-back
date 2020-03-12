@@ -1,5 +1,4 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const multer = require('multer');
 const uuidv4 = require('uuid/v4');
 
@@ -11,7 +10,6 @@ const utils = require('../utils');
 const liqpayClient = require('../liqpay_client');
 
 let router = express.Router();
-router.use(bodyParser.urlencoded({extended: true}));
 
 const upload = multer({
     storage: process.env.FILE_STORAGE_PATH || 'uploads/',

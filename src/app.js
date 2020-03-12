@@ -2,6 +2,7 @@ const express = require('express');
 const logger = require('./log');
 const {projects, transactions} = require('./controllers');
 const utils = require('./utils');
+const bodyParser = require('body-parser');
 
 // First of all - check environment variables
 if (!utils.isValidEnvironment(process.env)) {
@@ -11,6 +12,8 @@ if (!utils.isValidEnvironment(process.env)) {
 
 // Create Express app instance
 let app = express();
+
+app.use(bodyParser.urlencoded({extended: true}));
 
 // Set up logging middleware
 app.use(require('./middlewares/log'));
