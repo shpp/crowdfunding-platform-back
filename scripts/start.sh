@@ -4,6 +4,7 @@
 # Server URL is needed to provide it to LiqPay processing center for it
 # to be able to call back crowd-funding API for transactions status confirmation
 export SERVER_URL="https://donate.shpp.me"
+export FRONTEND_URL="https://donate.shpp.me"
 # Specify a port on which server will be listening
 export PORT=80
 # MongoDB database URI
