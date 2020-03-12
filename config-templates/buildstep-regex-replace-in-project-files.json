@@ -6,7 +6,7 @@
       ],
       "replace": {
         "SERVER_URL=[^\n]+": "SERVER_URL='<<BACK_URL>>'",
-        "FRONTEND_URL=[^\n]+": "FRONTEND_URL='<<FRONT_ULR>>'",
+        "FRONTEND_URL=[^\n]+": "FRONTEND_URL='<<FRONT_URL>>'",
         "PORT=80": "PORT=8080",
         "mongodb://[^/]+": "mongodb://<<MONGOUSER>>:<<MONGOPASS>>@<<MONGOHOSTPORT>>",
         "LIQPAY_PUBLIC_KEY=\"\"": "LIQPAY_PUBLIC_KEY='<<LIQPAY_PUBLIC_KEY>>'",
