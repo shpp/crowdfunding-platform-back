@@ -168,7 +168,7 @@ router.route('/liqpay-confirmation')
             return;
         }
 
-        sendResponse(res, 200);
+        sendResponse(res, 200, {info: "transaction successfully added"});
     });
 
 module.exports = router;
