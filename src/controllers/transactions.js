@@ -160,7 +160,7 @@ router.route('/liqpay-confirmation')
         const projectId = data['order_id'].split('-')[0];
 
         // Create a transaction
-        const transactionId = await Transaction.create(projectId, 'liqpay', data.amount, undefined, undefined, String(data['payment_id']));
+        const transactionId = await Transaction.create(projectId, 'liqpay', data.amount, undefined, data['sender_phone'], String(data['payment_id']));
 
         // Respond with 500 code in case of transaction creation failure.
         if (transactionId === null) {
