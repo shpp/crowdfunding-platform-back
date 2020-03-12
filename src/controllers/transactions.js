@@ -156,7 +156,7 @@ router.route('/liqpay-confirmation')
         }
 
         // Convert data to JS object
-        const data = JSON.parse(new Buffer(req.body['data'], 'base64').toString());
+        const data = JSON.parse(Buffer.from(req.body['data'], 'base64').toString());
 
         // Skip unsuccessful payments
         if (data['status'] !== 'success') {
