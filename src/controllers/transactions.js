@@ -8,6 +8,8 @@ const utils = require('../utils');
 const liqpayClient = require('../liqpay_client');
 const {sendResponse} = utils;
 
+const logger = require('../log');
+
 let router = express.Router();
 
 router.route('/create')
