@@ -15,9 +15,9 @@
         "ADMIN_TOKEN=\"\"": "ADMIN_TOKEN='<<ADMIN_TOKEN>>'",
         "SES_USER=[^\n]+": "SES_USER='<<SES_SMTP_USER>>'",
         "SES_PASS=[^\n]+": "SES_PASS='<<SES_SMTP_PASS>>'",
-        "SES_FROM=[^\n]+": "SES_FROM='<<SES_SMTP_FROM>>'",
+        "SES_FROM=[^\n]+": "SES_FROM='<<SES_SMTP_MAILFROM>>'",
         "SES_HOST=[^\n]+": "SES_HOST='<<SES_HOST>>'",
-        "ADMIN_EMAIL=[^\n]+": "ADMIN_EMAIL='<<ADMIN_EMAIL>>'"
+        "ADMIN_MAIL=[^\n]+": "ADMIN_MAIL='<<ADMIN_MAIL>>'"
       }
     }
   ]
