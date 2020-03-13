@@ -5,6 +5,12 @@
 # to be able to call back crowd-funding API for transactions status confirmation
 export SERVER_URL="https://donate.shpp.me"
 export FRONTEND_URL="https://donate.shpp.me"
+
+export SES_HOST=""
+export SES_USER=""
+export SES_PASS=""
+export SES_FROM=""
+export ADMIN_MAIL=""
 # Specify a port on which server will be listening
 export PORT=80
 # MongoDB database URI

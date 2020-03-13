@@ -9,7 +9,7 @@ const liqpayClient = require('../liqpay_client');
 const {sendResponse} = utils;
 
 const logger = require('../log');
-
+const {sendMail} = require('../mail');
 let router = express.Router();
 
 router.route('/create')
@@ -152,6 +152,18 @@ router.route('/liqpay-confirmation')
         logger.info(`Parsed data: ${JSON.stringify(data)}`);
         // Skip unsuccessful payments
         if (!['success', 'wait_accept'].includes(data['status'])) {
+            sendMail(
+                `<div>
+                    <p><strong>Произошла ошибка при оплате на <a href="https://donate.shpp.me">donate.shpp.me</a></strong>/</p>
+                    <p><strong>Телефон:</strong> <a href="tel:${data['sender_phone']}">${data['sender_phone']}</a></p>
+                    <p><strong>Сумма:</strong> ${data.amount}${data.currency}</p>
+                    <p><strong>Описание:</strong>${data.description}</p>
+                    <p><strong>Статус:</strong>${data['status']}</p>
+                    <p><strong>Действие:</strong>${data['action']}</p>
+                    <p><strong>ID транзакции:</strong>${data['transaction_id']}</p>
+                    <p>Нужно узнать у техподдержки liqpay, в чём причина проблемы.</p>
+                </div>`
+            );
             sendResponse(res, 200, {error: 'wrong status: ' + data['status']});
             return;
         }
@@ -159,15 +171,24 @@ router.route('/liqpay-confirmation')
         // Determine project ID
         const projectId = data['order_id'].split('-')[0];
 
-        // Create a transaction
-        const transactionId = await Transaction.create(projectId, 'liqpay', data.amount, undefined, data['sender_phone'], String(data['payment_id']));
+        if (projectId) {
+            // Create a transaction
+            const transactionId = await Transaction.create(projectId, 'liqpay', data.amount, undefined, data['sender_phone'], String(data['payment_id']));
 
-        // Respond with 500 code in case of transaction creation failure.
-        if (transactionId === null) {
-            sendResponse(res, 500, {error: 'Try again later.'});
-            return;
+            // Respond with 500 code in case of transaction creation failure.
+            if (transactionId === null) {
+                sendResponse(res, 500, {error: 'Try again later.'});
+                return;
+            }
         }
-
+        sendMail(
+            `<div>
+                <p><b>Новая оплата с <a href="https://donate.shpp.me">donate.shpp.me</a></b></p>
+                <p><strong>Телефон:</strong> <a href="tel:${data['sender_phone']}">${data['sender_phone']}</a></p>
+                <p><strong>Сумма:</strong> ${data.amount}${data.currency}</p>
+                <p><strong>Описание:</strong>${data.description}</p>
+            </div>`
+        );
         sendResponse(res, 200, {info: "transaction successfully added"});
     });
 
