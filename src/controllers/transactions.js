@@ -150,7 +150,7 @@ router.route('/liqpay-confirmation')
         const data = JSON.parse(Buffer.from(req.body['data'], 'base64').toString());
 
         logger.info(`Parsed data: ${JSON.stringify(data)}`);
-        // Skip unsuccessful payments
+        // Notify about unsuccessful payments
         if (!['success', 'wait_accept'].includes(data['status'])) {
             sendMail(
                 `<div>
@@ -165,7 +165,6 @@ router.route('/liqpay-confirmation')
                 </div>`
             );
             sendResponse(res, 200, {error: 'wrong status: ' + data['status']});
-            return;
         }
 
         // Determine project ID
@@ -173,7 +172,7 @@ router.route('/liqpay-confirmation')
 
         if (projectId) {
             // Create a transaction
-            const transactionId = await Transaction.create(projectId, 'liqpay', data.amount, undefined, data['sender_phone'], String(data['payment_id']));
+            const transactionId = await Transaction.create(projectId, 'liqpay', data.amount, undefined, data['sender_phone'], String(data['payment_id']), data['status']);
 
             // Respond with 500 code in case of transaction creation failure.
             if (transactionId === null) {

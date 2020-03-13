@@ -7,7 +7,7 @@ const utils = require('../utils');
 
 const COLLECTION_NAME = 'transactions';
 
-module.exports.create = async function (projectId, type, amount, donatorName, donatorPhone, paymentId) {
+module.exports.create = async function (projectId, type, amount, donatorName, donatorPhone, paymentId, status) {
     // Validate project ID
     assert.ok(utils.isValidProjectId(projectId), 'Project ID must be a 24-digit hex string.');
 
@@ -43,7 +43,7 @@ module.exports.create = async function (projectId, type, amount, donatorName, do
         donatorPhone,
         paymentId,
         time: new Date(),
-        status: 'confirmed'
+        status: ['success', 'wait_accept'].includes(status) ? 'confirmed' : status
     };
 
     // Save transaction record to DB
