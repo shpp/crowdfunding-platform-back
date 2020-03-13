@@ -19,7 +19,7 @@ let transporter = nodemailer.createTransport({
   from: process.env.SES_FROM
 });
 
-module.exports.sendMail = ({message, recipient = config.emails.to, subject = config.emails.subject}) => {
+module.exports.sendMail = (message, recipient = config.emails.to, subject = config.emails.subject) => {
   logger.info(`Going to send email... ${JSON.stringify({message, recipient, subject})}`);
   transporter.sendMail({
     to: recipient,
