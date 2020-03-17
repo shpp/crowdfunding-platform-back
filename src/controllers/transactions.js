@@ -180,12 +180,18 @@ router.route('/liqpay-confirmation')
                 return;
             }
         }
+        const actions = {
+            subscribe: 'Подписался',
+            pay: 'Оплатил одноразово',
+            regular: 'Ежемесячное списание денег'
+        };
         sendMail(
             `<div>
                 <p><b>Новая оплата с <a href="https://donate.shpp.me">donate.shpp.me</a></b></p>
                 <p><strong>Телефон:</strong> <a href="tel:${data['sender_phone']}">${data['sender_phone']}</a></p>
                 <p><strong>Сумма:</strong> ${data.amount}${data.currency}</p>
                 <p><strong>Описание:</strong>${data.description}</p>
+                <p><strong>Действие:</strong>${actions[data.action] || data.action}</p>
             </div>`
         );
         sendResponse(res, 200, {info: "transaction successfully added"});
