@@ -168,7 +168,7 @@ router.route('/liqpay-confirmation')
         }
 
         // Determine project ID
-        const projectId = data['order_id'].split('-')[0];
+        const projectId = data['order_id'].split(':')[0];
 
         if (projectId) {
             // Create a transaction
