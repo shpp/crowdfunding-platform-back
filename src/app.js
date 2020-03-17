@@ -5,7 +5,7 @@ const uuidv4 = require('uuid/v4');
 const logger = require('./log');
 const {projects, transactions} = require('./controllers');
 const utils = require('./utils');
-const liqpayClient = require('../liqpay_client');
+const liqpayClient = require('./liqpay_client');
 
 // First of all - check environment variables
 if (!utils.isValidEnvironment(process.env)) {
