@@ -151,7 +151,7 @@ router.route('/liqpay-confirmation')
 
         logger.info(`Parsed data: ${JSON.stringify(data)}`);
         // Notify about unsuccessful payments
-        if (!['success', 'wait_accept'].includes(data['status'])) {
+        if (!['success', 'wait_accept', 'subscribed'].includes(data['status'])) {
             sendMail(
                 `<div>
                     <p><strong>Произошла ошибка при оплате на <a href="https://donate.shpp.me">donate.shpp.me</a></strong>/</p>
