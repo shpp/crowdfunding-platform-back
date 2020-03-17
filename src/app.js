@@ -46,7 +46,7 @@ app.use('/api/v1/donate', function(req, res) {
         'action': req.body.subscribe ? 'subscribe' : 'pay',
         'amount': req.body.amount,
         'currency': 'UAH',
-        'description': 'Благодійний внесок на діяльність ГО',
+        'description': 'Благодійний внесок на діяльність організації',
         'order_id': uuidv4(),
         'version': '3',
         'server_url': process.env.SERVER_URL + '/api/v1/transactions/liqpay-confirmation',
