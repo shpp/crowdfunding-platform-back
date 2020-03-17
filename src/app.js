@@ -34,6 +34,14 @@ app.use('/api/v1/donate', function(req, res) {
         utils.sendResponse(res, 400, {error: 'Missing or wrong amount.'});
         return;
     }
+    let subscription = {};
+    if(req.body.subscribe) {
+        subscription = {
+            "subscribe"             : "1",
+            "subscribe_date_start"  :  new Date().toISOString().replace(/T/, ' ').replace(/Z/, '').split('.')[0],
+            "subscribe_periodicity" : "month",
+        }
+    }
     const button = liqpayClient.cnb_form({
         'action': req.body.subscribe ? 'subscribe' : 'pay',
         'amount': req.body.amount,
@@ -41,7 +49,8 @@ app.use('/api/v1/donate', function(req, res) {
         'description': 'Благодійний внесок на діяльність ГО',
         'order_id': uuidv4(),
         'version': '3',
-        'server_url': process.env.SERVER_URL + '/api/v1/transactions/liqpay-confirmation'
+        'server_url': process.env.SERVER_URL + '/api/v1/transactions/liqpay-confirmation',
+        ...subscription
     });
     utils.sendResponse(res, 200, {button});
 });
