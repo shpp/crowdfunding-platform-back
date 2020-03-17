@@ -163,7 +163,7 @@ router.route('/liqpay-confirmation')
                     <p><strong>ID транзакции:</strong>${data['transaction_id']}</p>
                     <p>Нужно узнать у техподдержки liqpay, в чём причина проблемы.</p>
                 </div>`
-            );
+            , undefined, 'Ошибка при оплате на donate.shpp.me');
             sendResponse(res, 200, {error: 'wrong status: ' + data['status']});
         }
 
