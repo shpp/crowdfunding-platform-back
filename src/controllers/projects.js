@@ -204,7 +204,7 @@ router.route('/button')
             'amount': '300',
             'currency': 'UAH',
             'description': 'Безповоротна допомога проекту "' + project.name + '"',
-            'order_id': req.query['id'] + ':' + uuidv4(),
+            'order_id': uuidv4() + ':' + req.query['id'],
             'version': '3',
             'result_url': process.env.FRONTEND_URL + '/project/' + req.query['id'],
             'server_url': process.env.SERVER_URL + '/api/v1/transactions/liqpay-confirmation'
