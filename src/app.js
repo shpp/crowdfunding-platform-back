@@ -25,7 +25,7 @@ app.use(require('./middlewares/log'));
 app.use('/api/v1/projects', projects);
 app.use('/api/v1/transactions', transactions);
 app.use('/api/v1/donate', function(req, res) {
-    if (req.body.subscribe === undefined) {
+    if (req.body.subscribe === undefined || req.body.subscribe === "") {
         utils.sendResponse(res, 400, {error: 'Missing subscription status'});
         return;
     }
@@ -34,8 +34,9 @@ app.use('/api/v1/donate', function(req, res) {
         utils.sendResponse(res, 400, {error: 'Missing or wrong amount.'});
         return;
     }
+    const subscribe = String(req.body.subscribe) === 'true';
     let subscription = {};
-    if(req.body.subscribe) {
+    if(subscribe) {
         subscription = {
             "subscribe"             : "1",
             "subscribe_date_start"  :  new Date().toISOString().replace(/T/, ' ').replace(/Z/, '').split('.')[0],
@@ -43,12 +44,13 @@ app.use('/api/v1/donate', function(req, res) {
         }
     }
     const button = liqpayClient.cnb_form({
-        'action': req.body.subscribe ? 'subscribe' : 'pay',
+        'action': subscribe ? 'subscribe' : 'pay',
         'amount': req.body.amount,
         'currency': 'UAH',
         'description': 'Благодійний внесок на діяльність організації',
         'order_id': uuidv4(),
         'version': '3',
+        'result_url': process.env.FRONTEND_URL,
         'server_url': process.env.SERVER_URL + '/api/v1/transactions/liqpay-confirmation',
         ...subscription
     });
