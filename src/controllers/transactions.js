@@ -158,13 +158,14 @@ router.route('/liqpay-confirmation')
                     <p><strong>Телефон:</strong> <a href="tel:${data['sender_phone']}">${data['sender_phone']}</a></p>
                     <p><strong>Сумма:</strong> ${data.amount}${data.currency}</p>
                     <p><strong>Описание:</strong>${data.description}</p>
-                    <p><strong>Статус:</strong>${data['status']}</p>
-                    <p><strong>Действие:</strong>${data['action']}</p>
+                    <p><strong>Статус:</strong>${data.status} (Ошибка: ${data['err_code']} - ${data['err_description']})</p>
+                    <p><strong>Действие:</strong>${data.action}</p>
                     <p><strong>ID транзакции:</strong>${data['transaction_id']}</p>
                     <p>Нужно узнать у техподдержки liqpay, в чём причина проблемы.</p>
                 </div>`
             );
             sendResponse(res, 200, {error: 'wrong status: ' + data['status']});
+            return;
         }
 
         // Determine project ID
