@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const uuidv4 = require('uuid/v4');
 
 const logger = require('./log');
+import {sendMail} from "./mail";
 const {projects, transactions} = require('./controllers');
 const utils = require('./utils');
 const liqpayClient = require('./liqpay_client');
@@ -43,17 +44,32 @@ app.use('/api/v1/donate', function(req, res) {
             "subscribe_periodicity" : "month",
         }
     }
+    const order_id = uuidv4();
     const button = liqpayClient.cnb_form({
         'action': subscribe ? 'subscribe' : 'pay',
         'amount': req.body.amount,
         'currency': 'UAH',
         'description': 'Благодійний внесок на діяльність організації',
-        'order_id': uuidv4(),
+        'order_id': order_id,
         'version': '3',
         'result_url': process.env.FRONTEND_URL,
         'server_url': process.env.SERVER_URL + '/api/v1/transactions/liqpay-confirmation',
         ...subscription
     });
+
+    const emailInfo = req.body.email ? `<p><strong>Email:</strong> <a href="mailto:${req.body.email}">${req.body.email}</a></p>` : '';
+    const nameInfo = (req.body.name || req.body.surname) ? `<p><strong>Кто:</strong> ${req.body.name} ${req.body.surname}</p>` : '<p>Имя не указано</p>';
+    sendMail(
+        `<div>
+            <p><b>Человек собирается поддержать Ш++/КОВО на <a href="${process.env.FRONTEND_URL}">${process.env.FRONTEND_URL}</a></b></p>
+            ${emailInfo}
+            ${nameInfo}
+            <p><strong>Сумма:</strong> ${req.body.amount}${req.body.currency}</p>
+            <p><strong>Действие:</strong>${subscribe ? 'Подписка' : 'Разовая оплата'}</p>
+            <p><strong>${req.body.newsletter ? 'Просит подписать его на рассылку донаторам' : 'Не указал, что хочет подписаться на рассылку донаторам'}</strong></p>
+            <p><strong>ID покупки:</strong>${order_id}</p>
+        </div>`
+    , undefined, 'Человек собирается поддержать Ш++/КОВО на ' + process.env.FRONTEND_URL);
     utils.sendResponse(res, 200, {button});
 });
 
