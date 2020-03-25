@@ -7,9 +7,9 @@ const utils = require('../utils');
 
 const COLLECTION_NAME = 'transactions';
 
-module.exports.create = async function (projectId, type, amount, donatorName, donatorPhone, paymentId, status) {
+module.exports.create = async function ({projectId, type, amount, donatorName, donatorPhone, paymentId, status, subscription}) {
     // Validate project ID
-    assert.ok(utils.isValidProjectId(projectId), 'Project ID must be a 24-digit hex string.');
+    assert.ok(utils.isValidProjectId(projectId), 'Project ID must be a 24-digit hex string or shpp-kowo.');
 
     // Validate type
     if (type !== 'manual' && type !== 'liqpay') {
@@ -33,17 +33,22 @@ module.exports.create = async function (projectId, type, amount, donatorName, do
     if (paymentId !== undefined && typeof paymentId !== 'string') {
         throw 'Payment ID must be a string.';
     }
+    // Validate paymentId
+    if (subscription === undefined || typeof subscription !== 'boolean') {
+        throw 'Wrong ot missing subscription type.';
+    }
 
     // Create transaction entry
     const transaction = {
-        projectId: ObjectID(projectId),
-        amount: parseFloat(amount),
         type,
         donatorName,
         donatorPhone,
         paymentId,
+        subscription,
+        projectId: ObjectID(projectId),
+        amount: parseFloat(amount),
         time: new Date(),
-        status: ['success', 'wait_accept'].includes(status) ? 'confirmed' : status
+        status: ['success', 'wait_accept', 'subscribed'].includes(status) ? 'confirmed' : status
     };
 
     // Save transaction record to DB

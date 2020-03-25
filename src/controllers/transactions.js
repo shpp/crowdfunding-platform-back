@@ -168,18 +168,26 @@ router.route('/liqpay-confirmation')
         }
 
         // Determine project ID
-        const projectId = data['order_id'].split(':')[1];
+        const projectId = data['order_id'].split(':')[1] || "shpp-kowo";
 
-        if (projectId) {
-            // Create a transaction
-            const transactionId = await Transaction.create(projectId, 'liqpay', data.amount, undefined, data['sender_phone'], String(data['payment_id']), data['status']);
+        // Create a transaction
+        const transactionId = await Transaction.create({
+            projectId,
+            type: 'liqpay',
+            amount: data.amount,
+            donatorName: undefined,
+            donatorPhone: data['sender_phone'],
+            paymentId: String(data['payment_id']),
+            status: data['status'],
+            subscription: data.action === 'subscribe'
+        });
 
-            // Respond with 500 code in case of transaction creation failure.
-            if (transactionId === null) {
-                sendResponse(res, 500, {error: 'Try again later.'});
-                return;
-            }
+        // Respond with 500 code in case of transaction creation failure.
+        if (transactionId === null) {
+            sendResponse(res, 500, {error: 'Try again later.'});
+            return;
         }
+
         const actions = {
             subscribe: 'Подписался',
             pay: 'Оплатил одноразово',
