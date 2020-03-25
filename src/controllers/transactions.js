@@ -154,7 +154,7 @@ router.route('/liqpay-confirmation')
         if (!['success', 'wait_accept', 'subscribed'].includes(data['status'])) {
             sendMail(
                 `<div>
-                    <p><strong>Произошла ошибка при оплате на <a href="https://donate.shpp.me">donate.shpp.me</a></strong>/</p>
+                    <p><strong>Произошла ошибка при оплате на <a href="${process.env.FRONTEND_URL}">${process.env.FRONTEND_URL}</a></strong></p>
                     <p><strong>Телефон:</strong> <a href="tel:${data['sender_phone']}">${data['sender_phone']}</a></p>
                     <p><strong>Сумма:</strong> ${data.amount}${data.currency}</p>
                     <p><strong>Описание:</strong>${data.description}</p>
@@ -195,7 +195,7 @@ router.route('/liqpay-confirmation')
         };
         sendMail(
             `<div>
-                <p><b>Новая оплата с <a href="https://donate.shpp.me">donate.shpp.me</a></b></p>
+                <p><b>Новая оплата с <a href="${process.env.FRONTEND_URL}">${process.env.FRONTEND_URL}</a></b></p>
                 <p><strong>Телефон:</strong> <a href="tel:${data['sender_phone']}">${data['sender_phone']}</a></p>
                 <p><strong>Сумма:</strong> ${data.amount}${data.currency}</p>
                 <p><strong>Описание:</strong>${data.description}</p>
