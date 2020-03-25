@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const uuidv4 = require('uuid/v4');
 
 const logger = require('./log');
-import {sendMail} from "./mail";
+const {sendMail} = require('./mail');
 const {projects, transactions} = require('./controllers');
 const utils = require('./utils');
 const liqpayClient = require('./liqpay_client');
