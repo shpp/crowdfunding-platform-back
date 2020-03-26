@@ -57,17 +57,17 @@ app.use('/api/v1/donate', function(req, res) {
         ...subscription
     });
 
-    const emailInfo = req.body.email ? `<p><strong>Email:</strong> <a href="mailto:${req.body.email}">${req.body.email}</a></p>` : '';
-    const nameInfo = (req.body.name || req.body.surname) ? `<p><strong>Кто:</strong> ${req.body.name} ${req.body.surname}</p>` : '<p>Имя не указано</p>';
+    const emailInfo = req.body.email ? `<p><strong>Email: </strong><a href="mailto:${req.body.email}">${req.body.email}</a></p>` : '';
+    const nameInfo = (req.body.name || req.body.surname) ? `<p><strong>Кто: </strong>${req.body.name} ${req.body.surname}</p>` : '<p>Имя не указано</p>';
     sendMail(
         `<div>
             <p><b>Человек собирается поддержать Ш++/КОВО на <a href="${process.env.FRONTEND_URL}">${process.env.FRONTEND_URL}</a></b></p>
             ${emailInfo}
             ${nameInfo}
-            <p><strong>Сумма:</strong> ${req.body.amount}UAH</p>
-            <p><strong>Действие:</strong>${subscribe ? 'Подписка' : 'Разовая оплата'}</p>
+            <p><strong>Сумма: </strong>${req.body.amount}UAH</p>
+            <p><strong>Действие: </strong>${subscribe ? 'Подписка' : 'Разовая оплата'}</p>
             <p><strong>${req.body.newsletter ? 'Просит подписать его на рассылку донаторам' : 'Не указал, что хочет подписаться на рассылку донаторам'}</strong></p>
-            <p><strong>ID покупки:</strong>${order_id}</p>
+            <p><strong>ID покупки: </strong>${order_id}</p>
         </div>`
     , undefined, 'Человек собирается поддержать Ш++/КОВО на ' + process.env.FRONTEND_URL);
     utils.sendResponse(res, 200, {button});

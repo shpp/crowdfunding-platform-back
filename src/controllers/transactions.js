@@ -155,13 +155,13 @@ router.route('/liqpay-confirmation')
             sendMail(
                 `<div>
                     <p><strong>Произошла ошибка при оплате на <a href="${process.env.FRONTEND_URL}">${process.env.FRONTEND_URL}</a></strong></p>
-                    <p><strong>Телефон:</strong> <a href="tel:${data['sender_phone']}">${data['sender_phone']}</a></p>
-                    <p><strong>Сумма:</strong> ${data.amount}${data.currency}</p>
-                    <p><strong>Описание:</strong>${data.description}</p>
-                    <p><strong>Статус:</strong>${data['status']}</p>
-                    <p><strong>Действие:</strong>${data['action']}</p>
-                    <p><strong>ID транзакции:</strong>${data['transaction_id']}</p>
-                    <p><strong>ID покупки:</strong>${data['order_id']}</p>
+                    <p><strong>Телефон: </strong><a href="tel:${data['sender_phone']}">${data['sender_phone']}</a></p>
+                    <p><strong>Сумма: </strong>${data.amount}${data.currency}</p>
+                    <p><strong>Описание: </strong>${data.description}</p>
+                    <p><strong>Статус: </strong>${data['status']}</p>
+                    <p><strong>Действие: </strong>${data['action']}</p>
+                    <p><strong>ID транзакции: </strong>${data['transaction_id']}</p>
+                    <p><strong>ID покупки: </strong>${data['order_id']}</p>
                     <p>Нужно узнать у техподдержки liqpay, в чём причина проблемы.</p>
                 </div>`
             , undefined, 'Ошибка при оплате на donate.shpp.me');
@@ -197,11 +197,11 @@ router.route('/liqpay-confirmation')
         sendMail(
             `<div>
                 <p><b>Новая оплата с <a href="${process.env.FRONTEND_URL}">${process.env.FRONTEND_URL}</a></b></p>
-                <p><strong>Телефон:</strong> <a href="tel:${data['sender_phone']}">${data['sender_phone']}</a></p>
-                <p><strong>Сумма:</strong> ${data.amount}${data.currency}</p>
-                <p><strong>Описание:</strong>${data.description}</p>
-                <p><strong>Действие:</strong>${actions[data.action] || data.action}</p>
-                <p><strong>ID покупки:</strong>${data['order_id']}</p>
+                <p><strong>Телефон: </strong><a href="tel:${data['sender_phone']}">${data['sender_phone']}</a></p>
+                <p><strong>Сумма: </strong>${data.amount}${data.currency}</p>
+                <p><strong>Описание: </strong>${data.description}</p>
+                <p><strong>Действие: </strong>${actions[data.action] || data.action}</p>
+                <p><strong>ID покупки: </strong>${data['order_id']}</p>
             </div>`
         );
         sendResponse(res, 200, {info: "transaction successfully added"});
