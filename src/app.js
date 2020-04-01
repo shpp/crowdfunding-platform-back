@@ -45,7 +45,7 @@ app.use('/api/v1/donate', function(req, res) {
         }
     }
     const order_id = uuidv4();
-    const button = liqpayClient.cnb_form({
+    const cnb_object = liqpayClient.cnb_object({
         'action': subscribe ? 'subscribe' : 'pay',
         'amount': req.body.amount,
         'currency': 'UAH',
@@ -70,7 +70,7 @@ app.use('/api/v1/donate', function(req, res) {
             <p><strong>ID покупки: </strong>${order_id}</p>
         </div>`
     , undefined, 'Человек собирается поддержать Ш++/КОВО на ' + process.env.FRONTEND_URL);
-    utils.sendResponse(res, 200, {button});
+    utils.sendResponse(res, 200, cnb_object);
 });
 
 // Set up static route for images
