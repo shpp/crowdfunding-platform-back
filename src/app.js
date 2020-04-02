@@ -66,7 +66,7 @@ app.use('/api/v1/donate', function(req, res) {
             ${nameInfo}
             <p><strong>Сумма: </strong>${req.body.amount}UAH</p>
             <p><strong>Действие: </strong>${subscribe ? 'Подписка' : 'Разовая оплата'}</p>
-            <p><strong>${req.body.newsletter ? 'Просит подписать его на рассылку донаторам' : 'Не указал, что хочет подписаться на рассылку донаторам'}</strong></p>
+            <p><strong>${req.body.newsletter === 'true' ? 'Просит подписать его на рассылку донаторам' : 'Не указал, что хочет подписаться на рассылку донаторам'}</strong></p>
             <p><strong>ID покупки: </strong>${order_id}</p>
         </div>`
     , undefined, 'Человек собирается поддержать Ш++/КОВО на ' + process.env.FRONTEND_URL);
