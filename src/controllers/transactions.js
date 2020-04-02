@@ -151,42 +151,59 @@ router.route('/liqpay-confirmation')
 
         logger.info(`Parsed data: ${JSON.stringify(data)}`);
         // Notify about unsuccessful payments
-        if (!['success', 'wait_accept'].includes(data['status'])) {
+        if (!['success', 'wait_accept', 'subscribed'].includes(data['status'])) {
             sendMail(
                 `<div>
-                    <p><strong>Произошла ошибка при оплате на <a href="https://donate.shpp.me">donate.shpp.me</a></strong>/</p>
+                    <p><strong>Произошла ошибка при оплате на <a href="${process.env.FRONTEND_URL}">${process.env.FRONTEND_URL}</a></strong></p>
                     <p><strong>Телефон:</strong> <a href="tel:${data['sender_phone']}">${data['sender_phone']}</a></p>
-                    <p><strong>Сумма:</strong> ${data.amount}${data.currency}</p>
                     <p><strong>Описание:</strong>${data.description}</p>
                     <p><strong>Статус:</strong>${data.status} (Ошибка: ${data['err_code']} - ${data['err_description']})</p>
                     <p><strong>Действие:</strong>${data.action}</p>
-                    <p><strong>ID транзакции:</strong>${data['transaction_id']}</p>
+                    <p><strong>Телефон: </strong><a href="tel:${data['sender_phone']}">${data['sender_phone']}</a></p>
+                    <p><strong>Сумма: </strong>${data.amount}${data.currency}</p>
+                    <p><strong>ID транзакции: </strong>${data['transaction_id']}</p>
+                    <p><strong>ID покупки: </strong>${data['order_id']}</p>
                     <p>Нужно узнать у техподдержки liqpay, в чём причина проблемы.</p>
                 </div>`
-            );
+            , undefined, 'Ошибка при оплате на donate.shpp.me');
             sendResponse(res, 200, {error: 'wrong status: ' + data['status']});
             return;
         }
 
         // Determine project ID
-        const projectId = data['order_id'].split('-')[0];
+        const projectId = data['order_id'].split(':')[1] || "shpp-kowo";
 
-        if (projectId) {
-            // Create a transaction
-            const transactionId = await Transaction.create(projectId, 'liqpay', data.amount, undefined, data['sender_phone'], String(data['payment_id']), data['status']);
+        // Create a transaction
+        const transactionId = await Transaction.create({
+            projectId,
+            type: 'liqpay',
+            amount: data.amount,
+            donatorName: undefined,
+            donatorPhone: data['sender_phone'],
+            paymentId: String(data['payment_id']),
+            status: data['status'],
+            subscription: data.action === 'subscribe'
+        });
 
-            // Respond with 500 code in case of transaction creation failure.
-            if (transactionId === null) {
-                sendResponse(res, 500, {error: 'Try again later.'});
-                return;
-            }
+        // Respond with 500 code in case of transaction creation failure.
+        if (transactionId === null) {
+            sendResponse(res, 500, {error: 'Try again later.'});
+            return;
         }
+
+        const actions = {
+            subscribe: 'Подписался',
+            pay: 'Оплатил одноразово',
+            regular: 'Ежемесячное списание денег'
+        };
         sendMail(
             `<div>
-                <p><b>Новая оплата с <a href="https://donate.shpp.me">donate.shpp.me</a></b></p>
-                <p><strong>Телефон:</strong> <a href="tel:${data['sender_phone']}">${data['sender_phone']}</a></p>
-                <p><strong>Сумма:</strong> ${data.amount}${data.currency}</p>
-                <p><strong>Описание:</strong>${data.description}</p>
+                <p><b>Новая оплата с <a href="${process.env.FRONTEND_URL}">${process.env.FRONTEND_URL}</a></b></p>
+                <p><strong>Телефон: </strong><a href="tel:${data['sender_phone']}">${data['sender_phone']}</a></p>
+                <p><strong>Сумма: </strong>${data.amount}${data.currency}</p>
+                <p><strong>Описание: </strong>${data.description}</p>
+                <p><strong>Действие: </strong>${actions[data.action] || data.action}</p>
+                <p><strong>ID покупки: </strong>${data['order_id']}</p>
             </div>`
         );
         sendResponse(res, 200, {info: "transaction successfully added"});
