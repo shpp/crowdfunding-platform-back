@@ -199,6 +199,7 @@ router.route('/liqpay-confirmation')
         sendMail(
             `<div>
                 <p><b>Новая оплата с <a href="${process.env.FRONTEND_URL}">${process.env.FRONTEND_URL}</a></b></p>
+                <p><strong>Кто: </strong>${data['sender_first_name'] || 'неизвестно'} ${data['sender_last_name'] || 'неизвестно'}</p>
                 <p><strong>Телефон: </strong><a href="tel:${data['sender_phone']}">${data['sender_phone']}</a></p>
                 <p><strong>Сумма: </strong>${data.amount}${data.currency}</p>
                 <p><strong>Описание: </strong>${data.description}</p>
