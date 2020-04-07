@@ -1,4 +1,4 @@
-import {toHex} from "../utils";
+const {toHex} = require('../utils');
 
 const assert = require('assert');
 
