@@ -70,3 +70,15 @@ module.exports.sendResponse = (res, code, data) => {
         })
     }
 };
+
+module.exports.toHex = function (str){
+    let hex, i;
+
+    let result = "";
+    for (i=0; i<str.length; i++) {
+        hex = str.charCodeAt(i).toString(16);
+        result += ("0"+hex).slice(-2);
+    }
+
+    return result
+};

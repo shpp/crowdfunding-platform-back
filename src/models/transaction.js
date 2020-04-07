@@ -1,3 +1,5 @@
+import {toHex} from "../utils";
+
 const assert = require('assert');
 
 const {ObjectID} = require("mongodb");
@@ -45,7 +47,7 @@ module.exports.create = async function ({projectId, type, amount, donatorName, d
         donatorPhone,
         paymentId,
         subscription,
-        projectId: ObjectID(projectId),
+        projectId: ObjectID(projectId === 'shpp-kowo' ? toHex(projectId) : projectId),
         amount: parseFloat(amount),
         time: new Date(),
         status: ['success', 'wait_accept', 'subscribed'].includes(status) ? 'confirmed' : status
