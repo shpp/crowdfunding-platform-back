@@ -47,7 +47,7 @@ module.exports.create = async function ({projectId, type, amount, donatorName, d
         donatorPhone,
         paymentId,
         subscription,
-        projectId: ObjectID(projectId === 'shpp-kowo' ? toHex(projectId.padStart(24, '.')) : projectId),
+        projectId: ObjectID(projectId === 'shpp-kowo' ? toHex(projectId.padStart(12, '.')) : projectId),
         amount: parseFloat(amount),
         time: new Date(),
         status: ['success', 'wait_accept', 'subscribed'].includes(status) ? 'confirmed' : status
