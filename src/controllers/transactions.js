@@ -178,7 +178,7 @@ router.route('/liqpay-confirmation')
             projectId,
             type: 'liqpay',
             amount: data.amount,
-            donatorName: undefined,
+            donatorName: data['sender_first_name'] + data['sender_last_name'],
             donatorPhone: data['sender_phone'],
             paymentId: String(data['payment_id']),
             status: data['status'],

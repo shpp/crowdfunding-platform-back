@@ -48,7 +48,8 @@ app.use('/api/v1/donate', function(req, res) {
     const cnb_object = liqpayClient.cnb_object({
         'action': subscribe ? 'subscribe' : 'pay',
         'amount': req.body.amount,
-        'currency': 'UAH',
+        'currency': req.body.currency,
+        'language': req.body.language,
         'description': 'Благодійний внесок на діяльність організації',
         'order_id': order_id,
         'version': '3',
@@ -66,7 +67,7 @@ app.use('/api/v1/donate', function(req, res) {
             ${nameInfo}
             <p><strong>Сумма: </strong>${req.body.amount}UAH</p>
             <p><strong>Действие: </strong>${subscribe ? 'Подписка' : 'Разовая оплата'}</p>
-            <p><strong>${req.body.newsletter === 'true' ? 'Просит подписать его на рассылку донаторам' : 'Не указал, что хочет подписаться на рассылку донаторам'}</strong></p>
+            ${req.body.newsletter === 'true' ? '<p><strong>Просит подписать его на рассылку донаторам</strong></p>' : ''}
             <p><strong>ID покупки: </strong>${order_id}</p>
         </div>`
     , undefined, 'Человек собирается поддержать Ш++/КОВО на ' + process.env.FRONTEND_URL);
