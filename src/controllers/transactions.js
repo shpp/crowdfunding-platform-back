@@ -30,7 +30,7 @@ router.route('/create')
         // Create a transaction
         const transactionId = await Transaction.create({
             ...req.body,
-            type: 'manual',
+            status: 'confirmed'
         });
 
         // Check DB operation for the error

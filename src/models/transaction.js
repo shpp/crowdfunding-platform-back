@@ -17,7 +17,7 @@ module.exports.create = async function (data) {
     const transactionFields = [
         'type', 'donator_name', 'donator_phone',
         'donator_surname', 'donator_email', 'order_id',
-        'payment_id', 'subscription', 'amount'
+        'payment_id', 'subscription', 'amount', 'status'
     ];
 
     // Update project record
