@@ -59,7 +59,7 @@ module.exports.get = async function (id) {
 };
 
 module.exports.update = async function (data) {
-    const validation = validate({data}, validations.order.update);
+    const validation = validate(data, validations.order.update);
     if (validation) {
         logger.error('Invalid action "update order"', {data: {validation, data}});
         return false;
