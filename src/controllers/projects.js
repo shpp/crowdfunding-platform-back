@@ -8,10 +8,9 @@ const auth = require('../middlewares/auth');
 const validation = require('../middlewares/validation');
 
 const logger = require('../log');
-const validation = require('../middlewares/validation');
-
 const utils = require('../utils');
 const liqpayClient = require('../liqpay_client');
+
 const {sendResponse} = utils;
 
 let router = express.Router();
