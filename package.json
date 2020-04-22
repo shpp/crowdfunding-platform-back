@@ -1,12 +1,13 @@
 {
   "name": "crowdfunding-backend",
   "version": "1.0.0",
-  "description": "Node.JS SHPP crowd-funding backend",
+  "description": "Node.JS SHPP crowdfunding backend",
   "main": "src/app.js",
   "scripts": {
     "start": "./scripts/start.sh",
     "test": "./scripts/test.sh",
     "cover": "./scripts/cover.sh",
+    "migrate": "./scripts/migrate.sh",
     "build": "echo nothing to build...",
     "coveralls": "npm run cover -- --report lcovonly && cat ./coverage/lcov.info | coveralls"
   },

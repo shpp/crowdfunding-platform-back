@@ -1,1 +1,2 @@
-do-default 
+npm run migrate
+do-default
