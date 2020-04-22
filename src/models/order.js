@@ -58,13 +58,13 @@ module.exports.get = async function (id) {
     return stringifyField(await db.db().collection(COLLECTION_NAME).findOne({_id: ObjectID(id)}));
 };
 
-module.exports.update = async function (id) {
-    const validation = validate({id}, validations.order.update);
+module.exports.update = async function (data) {
+    const validation = validate({data}, validations.order.update);
     if (validation) {
-        logger.error('Invalid action "update order"', {data: {validation, id}});
+        logger.error('Invalid action "update order"', {data: {validation, data}});
         return false;
     }
-    const previousOrder = await db.db().collection(COLLECTION_NAME).findOne({_id: ObjectID(id)});
+    const previousOrder = await db.db().collection(COLLECTION_NAME).findOne({_id: ObjectID(data.id)});
 
     // Check if order exists
     if (previousOrder === null) {
@@ -78,7 +78,7 @@ module.exports.update = async function (id) {
 
 
     // Update order record
-    const response = await db.db().collection(COLLECTION_NAME).updateOne({_id: ObjectID(id)}, {
+    const response = await db.db().collection(COLLECTION_NAME).updateOne({_id: ObjectID(data.id)}, {
         $set: newOrder
     });
 
