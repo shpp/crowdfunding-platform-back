@@ -112,8 +112,8 @@ router.route('/button')
         }
 
         const descriptions = {
-            uk: 'Безповоротна допомога проекту "' + project.name + '"',
-            en: 'Donation to the project "' + project.name + '"'
+            uk: 'Безповоротна допомога проекту "' + project[`${name}_${req.query.language}`] + '"',
+            en: 'Donation to the project "' + project[`${name}_${req.query.language}`] + '"'
         };
 
         // Generate LiqPay button
