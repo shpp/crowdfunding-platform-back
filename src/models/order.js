@@ -61,7 +61,7 @@ module.exports.get = async function (id) {
 module.exports.update = async function (id) {
     const validation = validate({id}, validations.order.update);
     if (validation) {
-        logger.error('Invalid action "update order"', {id: {validation, id}});
+        logger.error('Invalid action "update order"', {data: {validation, id}});
         return false;
     }
     const previousOrder = await db.db().collection(COLLECTION_NAME).findOne({_id: ObjectID(id)});
