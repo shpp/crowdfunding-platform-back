@@ -45,3 +45,4 @@ module.exports.close = async function () {
     db = undefined;
     client = undefined;
 };
+
