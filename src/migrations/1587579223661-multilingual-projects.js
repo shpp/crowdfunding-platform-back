@@ -7,16 +7,16 @@ module.exports.up = async function () {
   const updates = projects.map((project) => {
     return db.db().collection("projects").updateOne({_id: project._id}, {
       $set: {
-        name_uk: project.name,
-        name_en: project.name,
-        short_description_en: project.short_description,
-        short_description_uk: project.short_description,
-        description_en: project.description,
-        description_uk: project.description,
-        actual_spendings_en: project.actual_spendings,
-        actual_spendings_uk: project.actual_spendings,
-        planned_spendings_en: project.planned_spendings,
-        planned_spendings_uk: project.planned_spendings,
+        name_uk: project.name_uk || project.name,
+        name_en: project.name_en || project.name,
+        short_description_en: project.short_description_en || project.short_description,
+        short_description_uk: project.short_description_uk || project.short_description,
+        description_en: project.description_en || project.description,
+        description_uk: project.description_uk || project.description,
+        actual_spendings_en: project.actual_spendings_en || project.actual_spendings,
+        actual_spendings_uk: project.actual_spendings_uk || project.actual_spendings,
+        planned_spendings_en: project.planned_spendings_en || project.planned_spendings,
+        planned_spendings_uk: project.planned_spendings_uk || project.planned_spendings,
       }
     })
   });
