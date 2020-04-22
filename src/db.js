@@ -6,14 +6,13 @@ const {URL} = require('url');
 let client;
 let db;
 
-
 module.exports.init = async function (url) {
     if (db !== undefined) {
         throw 'Trying to initialize already initialized Database.';
     }
 
     // Connect to MongoDB
-    client = await MongoClient.connect(url, {
+    client = await MongoClient.connect(url + "?authSource=admin&authMechanism=DEFAULT", {
         useUnifiedTopology: true,
         useNewUrlParser: true
     });

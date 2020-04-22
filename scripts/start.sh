@@ -13,6 +13,7 @@ export SES_FROM=""
 export ADMIN_MAIL=""
 # Specify a port on which server will be listening
 export PORT=80
+export NODE_ENV=production
 # MongoDB database URI
 export MONGODB_URI="mongodb://localhost:27017/shpp-crowd-funding"
 # LiqPay API public and private keys
