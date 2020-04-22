@@ -12,12 +12,12 @@ module.exports = {
                     planned_spendings: project.plannedSpendings,
                     created_at: project.createdAtTS,
                 },
-                $unset: {
-                    shortDescription: "",
-                    actualSpendings: "",
-                    plannedSpendings: "",
-                    createdAtTS: ""
-                }
+                // $unset: {
+                //     shortDescription: "",
+                //     actualSpendings: "",
+                //     plannedSpendings: "",
+                //     createdAtTS: ""
+                // }
             });
         });
         await Promise.all(updates);
