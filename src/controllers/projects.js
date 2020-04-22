@@ -123,7 +123,7 @@ router.route('/button')
             'amount': req.query.currency === 'EUR' ? '20' : '300',
             'currency': req.query.currency || 'UAH',
             'language': req.query.language || 'uk',
-            'description': descriptions[req.body.language || 'uk'],
+            'description': descriptions[req.query.language || 'uk'],
             'order_id': uuidv4() + ':' + req.query['id'],
             'version': '3',
             'result_url': process.env.FRONTEND_URL + '/project/' + req.query['id'],
