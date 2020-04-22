@@ -1,23 +1,29 @@
 const express = require('express');
+const cors = require('cors');
 const bodyParser = require('body-parser');
-const uuidv4 = require('uuid/v4');
+const validate = require("validate.js");
 
 const logger = require('./log');
-const {sendMail} = require('./mail');
-const {projects, transactions} = require('./controllers');
-const utils = require('./utils');
-const liqpayClient = require('./liqpay_client');
+const validations = require('./validations');
+const {projects, transactions, orders} = require('./controllers');
 
 // First of all - check environment variables
-if (!utils.isValidEnvironment(process.env)) {
-    logger.error('Environment variables are not set properly.');
+const envValidationResult = validate(process.env, validations.env);
+if (envValidationResult) {
+    logger.error('Invalid environmental variables', {data: envValidationResult});
     process.exit(1);
 }
 
 // Create Express app instance
 let app = express();
 
-app.use(bodyParser.urlencoded({extended: true}));
+if (process.env.NODE_ENV === 'development') {
+    app.use(cors({
+        origin: (o, cb) => cb(null, true), //o.startsWith(process.env.FRONTEND_URL) ? cb(null, true) : cb(new Error('Not allowed by CORS')),
+        credentials: true
+    }));
+}
+app.use(bodyParser.json({extended: true}));
 
 // Set up logging middleware
 app.use(require('./middlewares/log'));
@@ -25,64 +31,17 @@ app.use(require('./middlewares/log'));
 // Set up controllers
 app.use('/api/v1/projects', projects);
 app.use('/api/v1/transactions', transactions);
-app.use('/api/v1/donate', function(req, res) {
-    if (req.body.subscribe === undefined || req.body.subscribe === "") {
-        utils.sendResponse(res, 400, {error: 'Missing subscription status'});
-        return;
-    }
-    // Validate amount
-    if (!utils.isValidAmount(Number(req.body.amount))) {
-        utils.sendResponse(res, 400, {error: 'Missing or wrong amount.'});
-        return;
-    }
-    const subscribe = String(req.body.subscribe) === 'true';
-    let subscription = {};
-    if(subscribe) {
-        subscription = {
-            "subscribe"             : "1",
-            "subscribe_date_start"  :  new Date().toISOString().replace(/T/, ' ').replace(/Z/, '').split('.')[0],
-            "subscribe_periodicity" : "month",
-        }
-    }
-    const order_id = uuidv4();
-    const cnb_object = liqpayClient.cnb_object({
-        'action': subscribe ? 'subscribe' : 'pay',
-        'amount': req.body.amount,
-        'currency': req.body.currency,
-        'language': req.body.language,
-        'description': 'Благодійний внесок на діяльність організації',
-        'order_id': order_id,
-        'version': '3',
-        'result_url': process.env.FRONTEND_URL,
-        'server_url': process.env.SERVER_URL + '/api/v1/transactions/liqpay-confirmation',
-        ...subscription
-    });
-
-    const emailInfo = req.body.email ? `<p><strong>Email: </strong><a href="mailto:${req.body.email}">${req.body.email}</a></p>` : '';
-    const nameInfo = (req.body.name || req.body.surname) ? `<p><strong>Кто: </strong>${req.body.name} ${req.body.surname}</p>` : '<p>Имя не указано</p>';
-    sendMail(
-        `<div>
-            <p><b>Человек собирается поддержать Ш++/КОВО на <a href="${process.env.FRONTEND_URL}">${process.env.FRONTEND_URL}</a></b></p>
-            ${emailInfo}
-            ${nameInfo}
-            <p><strong>Сумма: </strong>${req.body.amount}UAH</p>
-            <p><strong>Действие: </strong>${subscribe ? 'Подписка' : 'Разовая оплата'}</p>
-            ${req.body.newsletter === 'true' ? '<p><strong>Просит подписать его на рассылку донаторам</strong></p>' : ''}
-            <p><strong>ID покупки: </strong>${order_id}</p>
-        </div>`
-    , undefined, 'Человек собирается поддержать Ш++/КОВО на ' + process.env.FRONTEND_URL);
-    utils.sendResponse(res, 200, cnb_object);
-});
+app.use('/api/v1/orders', orders);
 
 // Set up static route for images
 app.use('/static', express.static(process.env.FILE_STORAGE_PATH || 'uploads'));
 
 // Initialize DB
-require('./db').init(process.env.MONGODB_URI + "?authSource=admin&authMechanism=DEFAULT").then(() => {
+require('./db').init(process.env.MONGODB_URI).then(() => {
     logger.info('Successfully connected to the database.');
 
     // Listen server
     return app.listen(process.env.PORT || 80)
 }).then(() => {
-    logger.info(`SHPP Crowd-funding backend app running.`)
+    logger.info(`SHPP crowdfunding backend app running.`)
 });

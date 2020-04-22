@@ -8,6 +8,7 @@ const auth = require('../middlewares/auth');
 const validation = require('../middlewares/validation');
 
 const logger = require('../log');
+const validation = require('../middlewares/validation');
 
 const utils = require('../utils');
 const liqpayClient = require('../liqpay_client');
@@ -22,6 +23,7 @@ const upload = multer({
         fieldSize: 10000000
     }
 });
+router.use(validation);
 
 router.route('/create')
     .post(auth, async function (req, res) {
