@@ -1,0 +1,21 @@
+{{#extend "layout"}}
+{{#content "title"}}Hello {{name}}!{{/content}}
+{{#content "content"}}
+  <div>
+    <p>You have just donated to School++/KOWO at <a href="{{site_url}}">{{site_url}}</a></p>
+    <p>It is pretty important for us, because every new supporter makes us more independent, stable and fastens our growth.</p>
+    <p>The dream to teach for free and develop people, Kropyvnytskyi, Ukraine, becomes real with your help. It is so pleasant to know that one more person believes in the idea of place, where everything is kept on a volunteer basis and the desire to do good things.</p>
+    <p>By the way, you supported a social project, which is (like) unique in Ukraine, and we hope this inspires you as much as it inspires us.</p>
+    {{#if subscribe}}
+      <hr>
+      <p>Your subscription ID: <strong>{{order_id}}</strong></p>
+      <p>If you will need to cancel your subscription, please send this ID to <a href="mailto:donate@kowo.me">donate@kowo.me</a>.</p>
+      <hr>
+    {{/if}}
+    <p>
+      Thank you &hearts;<br>
+      Your School++
+    </p>
+  </div>
+{{/content}}
+{{/extend}}

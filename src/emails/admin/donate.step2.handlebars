@@ -1,0 +1,16 @@
+<div>
+  <p><b>Человек ввёл свои реквизиты на <a href="{{site_url}}">{{site_url}}</a></b></p>
+  {{#if email}}
+    <p><strong>Email: </strong><a href="mailto:{{email}}">{{email}}</a></p>
+  {{/if}}
+  {{#if user}}
+    <p><strong>Кто: </strong>{{name}} {{surname}}</p>
+  {{else}}
+    <p>Имя не указано</p>
+  {{/if}}
+  <p><strong>Сумма: </strong>{{amount}} {{currency}} {{#if UAH_amount}}({{UAH_amount}} UAH){{/if}}</p>
+  <p><strong>Действие: </strong>{{#if subscribe}}Подписка{{else}}Разовая оплата{{/if}}</p>
+  {{#if newsletter}}
+    <p><strong>Просит подписать его на рассылку донаторам</strong></p>
+  {{/if}}
+</div>

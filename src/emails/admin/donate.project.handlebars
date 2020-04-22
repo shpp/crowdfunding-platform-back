@@ -1,0 +1,13 @@
+<div>
+  <p><b>Человек подддержал проект на <a href="{{site_url}}">{{site_url}}</a></b></p>
+  {{#if personDefined}}
+    <p><strong>Кто: </strong>{{sender_first_name}} {{sender_last_name}}</p>
+  {{/if}}
+  {{#if sender_phone}}
+    <p><strong>Телефон: </strong><a href="tel:{{sender_phone}}">{{sender_phone}}</a></p>
+  {{/if}}
+  <p><strong>Сумма: </strong>{{amount}}{{currency}}</p>
+  <p><strong>Описание: </strong>{{description}}</p>
+  <p><strong>Действие: </strong>{{action}}</p>
+  <p><strong>ID покупки: </strong>{{order_id}}</p>
+</div>

@@ -1,0 +1,16 @@
+<div>
+  <p><b>Поступила оплата на <a href="{{site_url}}">{{site_url}}</a></b></p>
+  {{#if user}}
+    <p><strong>Кто: </strong>{{name}} {{surname}}</p>
+  {{/if}}
+  {{#if sender_phone}}
+    <p><strong>Телефон: </strong><a href="tel:{{sender_phone}}">{{sender_phone}}</a></p>
+  {{/if}}
+  {{#if email}}
+    <p><strong>Email: </strong><a href="mailto:{{email}}">{{email}}</a></p>
+  {{/if}}
+  <p><strong>Сумма: </strong>{{amount}}{{currency}}</p>
+  <p><strong>Описание: </strong>{{description}}</p>
+  <p><strong>Действие: </strong>{{action}}</p>
+  <p><strong>ID покупки: </strong>{{order_id}}</p>
+</div>

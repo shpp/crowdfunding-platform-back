@@ -1,0 +1,22 @@
+<div>
+  <p><strong>Произошла ошибка при оплате на <a href="{{site_url}}">{{site_url}}</a></strong></p>
+  {{#if user}}
+    <p><strong>Кто: </strong>{{name}} {{surname}}</p>
+  {{else}}
+    <p>Имя донатора неизвестно</p>
+  {{/if}}
+  {{#if sender_phone}}
+    <p><strong>Телефон:</strong> <a href="tel:{{sender_phone}}">{{sender_phone}}</a></p>
+  {{/if}}
+  {{#if email}}
+    <p><strong>Email:</strong> <a href="mailto:{{email}}">{{email}}</a></p>
+  {{/if}}
+  <p><strong>Описание:</strong>{{description}}</p>
+  <p><strong>Статус:</strong>{{status}} (Ошибка: {{err_code}} - {{err_description}})</p>
+  <p><strong>Действие:</strong>{{action}}</p>
+  <p><strong>Телефон: </strong><a href="tel:{{sender_phone}}">{{sender_phone}}</a></p>
+  <p><strong>Сумма: </strong>{{amount}} {{currency}}</p>
+  <p><strong>ID транзакции: </strong>{{transaction_id}}</p>
+  <p><strong>ID покупки: </strong>{{order_id}}</p>
+  <p>Нужно узнать у техподдержки liqpay, в чём причина проблемы.</p>
+</div>

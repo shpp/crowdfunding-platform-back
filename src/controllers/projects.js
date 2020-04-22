@@ -5,7 +5,10 @@ const uuidv4 = require('uuid/v4');
 const Project = require('../models/project');
 const Transaction = require('../models/transaction');
 const auth = require('../middlewares/auth');
+const validation = require('../middlewares/validation');
+
 const logger = require('../log');
+
 const utils = require('../utils');
 const liqpayClient = require('../liqpay_client');
 const {sendResponse} = utils;
@@ -21,97 +24,22 @@ const upload = multer({
 });
 
 router.route('/create')
-    .post(auth, async function (req, res, next) {
-        // Validate project name
-        if (typeof req.body['name'] !== 'string' || req.body['name'].length === 0) {
-            sendResponse(res, 400, {error: 'Missing or wrong project name.'});
-            return;
-        }
-
+    .post(auth, async function (req, res) {
         // Create a project
-        const projectId = await Project.create(req.body['name']);
+        const project_id = await Project.create(req.body);
 
         // Check DB operation for the error
-        if (projectId === null) {
+        if (project_id === null) {
             sendResponse(res, 500, {error: 'Operation can\'t be performed. Please, try again later.'});
             return;
         }
 
         // Respond with success and transaction ID.
-        sendResponse(res, 200, {project_id: projectId});
+        sendResponse(res, 200, {project_id});
     });
 
 router.route('/update')
     .post(auth, async function (req, res) {
-        // Validate project ID
-        if (req.body['_id'] === undefined || !utils.isValidProjectId(req.body['_id'])) {
-            sendResponse(res, 400, {error: 'Missing or wrong project ID.'});
-            return;
-        }
-
-        // Validate project name
-        if (req.body['name'] === undefined || typeof req.body['name'] !== 'string' || req.body['name'].length === 0) {
-            sendResponse(res, 400, {error: 'Missing or wrong project name.'});
-            return;
-        }
-
-        // Validate project state
-        if (req.body['state'] === undefined ||
-            typeof req.body['state'] !== 'string' ||
-            !(['unpublished', 'published', 'archived'].includes(req.body['state']))
-        ) {
-            sendResponse(res, 400, {error: 'Missing or wrong project state. State must be one of the following: [\'unpublished\', \'published\', \'archived\']'});
-            return;
-        }
-
-        // Validate project description
-        if (req.body['description'] === undefined || typeof req.body['description'] !== 'string' || req.body['description'].length === 0) {
-            sendResponse(res, 400, {error: 'Missing or wrong project description.'});
-            return;
-        }
-
-        // Validate project's short description
-        if (req.body['shortDescription'] === undefined || typeof req.body['shortDescription'] !== 'string' || req.body['shortDescription'].length === 0) {
-            sendResponse(res, 400, {error: 'Missing or wrong project short description.'});
-            return;
-        }
-
-        // Validate planned spendings
-        if (req.body['plannedSpendings'] === undefined || typeof req.body['plannedSpendings'] !== 'string' || req.body['plannedSpendings'].length === 0) {
-            sendResponse(res, 400, {error: 'Missing or wrong planned spendings.'});
-            return;
-        }
-
-        // Validate actual spendings
-        if (req.body['actualSpendings'] === undefined || typeof req.body['actualSpendings'] !== 'string') {
-            sendResponse(res, 400, {error: 'Missing or wrong actual spendings.'});
-            return;
-        }
-
-        // Validate cover image
-        if (!utils.isValidUrl(req.body['image'])) {
-            sendResponse(res, 400, {error: 'Missing or wrong cover image.'});
-            return;
-        }
-
-        // Validate amount
-        if (!utils.isValidAmount(Number(req.body['amount']))) {
-            sendResponse(res, 400, {error: 'Missing or wrong amount.'});
-            return;
-        }
-
-        // Validate creation time
-        if (!utils.isValidTimestamp(Number(req.body['createdAtTS']))) {
-            sendResponse(res, 400, {error: 'Missing or wrong creation time.'});
-            return;
-        }
-
-        // Validate currency
-        if (req.body['currency'] !== 'UAH') {
-            sendResponse(res, 400, {error: 'Missing or wrong currency.'});
-            return;
-        }
-
         // Update a project with new data
         const status = await Project.update(req.body);
 
@@ -125,24 +53,27 @@ router.route('/update')
         sendResponse(res, 200);
     });
 
+async function sumTransactions(project) {
+    // Fetch transactions by given project ID
+    const transactions = (await Transaction.listByProjectId(project._id))
+        // Count only confirmed transactions
+        .filter(t => t.status === 'confirmed');
+
+    const amount_funded = transactions.reduce((sum, t) => sum + (t.amount || 0), 0);
+    return {
+        ...project,
+        // Add dynamically calculated properties
+        amount_funded,
+        completed: amount_funded >= project.amount
+    };
+}
+
 router.route('/admin-list')
     .get(auth, async function (req, res) {
         let projects = await Project.list();
 
         // Populate response with funded amount
-        projects = await Promise.all(projects.map(async function (project) {
-            // Fetch transactions by given project ID
-            let transactions = await Transaction.listByProjectId(String(project._id));
-
-            // Count only confirmed transactions
-            transactions = transactions.filter(t => t.status === 'confirmed');
-
-            // Add dynamically calculated properties
-            project.amountFunded = transactions.reduce((sum, t) => sum + t.amount, 0);
-            project.completed = project.amountFunded >= project.amount;
-
-            return project;
-        }));
+        projects = await Promise.all(projects.map(sumTransactions));
 
         // Respond with success and projects list.
         sendResponse(res, 200, {projects});
@@ -156,20 +87,7 @@ router.route('/list')
         projects = projects.filter(p => p.state === 'published');
 
         // Populate response with funded amount
-        projects = await Promise.all(projects.map(async function (project) {
-            // Fetch transactions by given project ID
-            let transactions = await Transaction.listByProjectId(String(project._id));
-
-            // Count only confirmed transactions
-            transactions = transactions.filter(t => t.status === 'confirmed');
-
-            // Add dynamically calculated properties
-            project.bakers = transactions.length;
-            project.amountFunded = transactions.reduce((sum, t) => sum + t.amount, 0);
-            project.completed = project.amountFunded >= project.amount;
-
-            return project;
-        }));
+        projects = await Promise.all(projects.map(sumTransactions));
 
         // Respond with success and projects list.
         sendResponse(res, 200, {projects});
@@ -183,12 +101,6 @@ router.route('/upload-image')
 
 router.route('/button')
     .get(async function (req, res) {
-        // Validate project ID
-        if (req.query['id'] === undefined || !utils.isValidProjectId(req.query['id'])) {
-            sendResponse(res, 400, {error: 'Missing or wrong project ID.'});
-            return;
-        }
-
         // Obtain a project from DB
         const project = await Project.get(req.query['id']);
 
@@ -198,12 +110,19 @@ router.route('/button')
             return;
         }
 
+        const descriptions = {
+            uk: 'Безповоротна допомога проекту "' + project.name + '"',
+            en: 'Donation to the project "' + project.name + '"'
+        };
+
         // Generate LiqPay button
         const button = liqpayClient.cnb_form({
             'action': 'paydonate',
-            'amount': '300',
-            'currency': 'UAH',
-            'description': 'Безповоротна допомога проекту "' + project.name + '"',
+            // different amount per currency. default is UAH
+            'amount': req.query.currency === 'EUR' ? '20' : '300',
+            'currency': req.query.currency || 'UAH',
+            'language': req.query.language || 'uk',
+            'description': descriptions[req.body.language || 'uk'],
             'order_id': uuidv4() + ':' + req.query['id'],
             'version': '3',
             'result_url': process.env.FRONTEND_URL + '/project/' + req.query['id'],
