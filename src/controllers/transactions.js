@@ -3,6 +3,7 @@ const express = require('express');
 const Project = require('../models/project');
 const Transaction = require('../models/transaction');
 const auth = require('../middlewares/auth');
+const validation = require('../middlewares/validation');
 
 const utils = require('../utils');
 const liqpayClient = require('../liqpay_client');
@@ -11,6 +12,8 @@ const {sendResponse} = utils;
 const logger = require('../log');
 const {sendMail} = require('../mail');
 let router = express.Router();
+
+router.use(validation);
 
 router.route('/create')
     .post(auth, async function (req, res) {

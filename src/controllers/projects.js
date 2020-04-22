@@ -6,6 +6,8 @@ const Project = require('../models/project');
 const Transaction = require('../models/transaction');
 const auth = require('../middlewares/auth');
 const logger = require('../log');
+const validation = require('../middlewares/validation');
+
 const utils = require('../utils');
 const liqpayClient = require('../liqpay_client');
 const {sendResponse} = utils;
@@ -19,6 +21,7 @@ const upload = multer({
         fieldSize: 10000000
     }
 });
+router.use(validation);
 
 router.route('/create')
     .post(auth, async function (req, res, next) {

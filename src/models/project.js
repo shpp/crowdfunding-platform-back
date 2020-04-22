@@ -1,31 +1,27 @@
-const assert = require('assert');
+const validate = require('validate.js');
 
 const {ObjectID} = require("mongodb");
 
 const db = require('../db');
 const utils = require('../utils');
+const logger = require('../log');
+const validations = require('../validations');
+const {stringifyField} = require("../utils");
 
 const COLLECTION_NAME = 'projects';
 
-
-module.exports.create = async function (name) {
-    // Validate name
-    if (typeof name !== 'string' || name.length === 0) {
-        throw 'Name must be a string with length > 0.'
+module.exports.create = async function (data) {
+    const validation = validate(data, validations.project.create);
+    if (validation) {
+        logger.error('Invalid action "create project"', {data: {validation, data}});
+        return
     }
 
     // Create project
     const project = {
-        name,
+        name: data.name,
         state: 'unpublished',
-        description: '',
-        shortDescription: '',
-        plannedSpendings: '',
-        actualSpendings: '',
-        image: '',
-        amount: 0,
-        currency: 'UAH',
-        createdAtTS: +new Date()
+        created_at: ~~(+new Date())
     };
 
     // Save project record to DB
@@ -36,85 +32,45 @@ module.exports.create = async function (name) {
 };
 
 module.exports.get = async function (id) {
-    // Validate ID
-    assert.ok(utils.isValidProjectId(id), 'Project ID must be a 24-digit hex string.');
+    const validation = validate({id}, validations.project.get);
+    if (validation) {
+        logger.error('Invalid action "get project"', {data: {validation, id}});
+        return
+    }
 
-    return await db.db().collection(COLLECTION_NAME).findOne({_id: ObjectID(id)});
+    return stringifyField(await db.db().collection(COLLECTION_NAME).findOne({_id: ObjectID(id)}));
 };
 
-module.exports.update = async function ({
-                                            _id,
-                                            name,
-                                            state,
-                                            description,
-                                            shortDescription,
-                                            plannedSpendings,
-                                            actualSpendings,
-                                            image,
-                                            amount,
-                                            createdAtTS}) {
+module.exports.getByField = async function (value, key) {
+    return stringifyField(await db.db().collection(COLLECTION_NAME).findOne({[key]: value}));
+};
 
-    // Validate ID
-    assert.ok(utils.isValidProjectId(_id), 'Project ID must be a 24-digit hex string.');
-
-    // Validate name
-    if (typeof name !== 'string' || name.length === 0) {
-        throw 'Name must be a string with length > 0.'
-    }
-
-    // Validate state
-    if (typeof state !== 'string' || !(['unpublished', 'published', 'archived'].includes(state))) {
-        throw 'State must be one of the following: [\'unpublished\', \'published\', \'archived\'].'
-    }
-
-    // Validate description
-    if (typeof description !== 'string' || description.length === 0) {
-        throw 'Description must be a string with length > 0.'
-    }
-    // Validate short description
-    if (typeof shortDescription !== 'string' || shortDescription.length === 0) {
-        throw 'Short description must be a string with length > 0.'
-    }
-
-    // Validate plannedSpendings
-    if (typeof plannedSpendings !== 'string' || plannedSpendings.length === 0) {
-        throw 'Planned spendings must be a string with length > 0.'
-    }
-
-    // Validate actualSpendings
-    if (typeof actualSpendings !== 'string') {
-        throw 'Actual spendings must be a string.'
-    }
-    // Validate cover image
-    if (typeof image !== 'string') {
-        throw 'Image must be a string (URL).'
-    }
-
-    // to be sure that amount is number
-    amount = +amount;
-    // Validate amount
-    if (typeof amount !== 'number' || isNaN(amount) || !isFinite(amount) || amount < 0) {
-        throw 'Amount must be a non-negative real number.'
+module.exports.update = async function (data) {
+    const validation = validate(data, validations.project.update);
+    if (validation) {
+        logger.error('Invalid action "update project"', {data: {validation, data}});
+        return;
     }
 
     // Check if project exists
-    if (await db.db().collection(COLLECTION_NAME).findOne({_id: ObjectID(_id)}) === null) {
+    if (await db.db().collection(COLLECTION_NAME).findOne({_id: ObjectID(data.id)}) === null) {
         return false;
     }
+    const projectFields = [
+        'name_uk', 'description_uk', 'short_description_uk',
+        'planned_spendings_uk', 'actual_spendings_uk',
+        'name_en', 'description_en', 'short_description_en',
+        'planned_spendings_en', 'actual_spendings_en',
+        'image', 'currency', 'amount', 'state',
+        'created_at'
+    ];
 
     // Update project record
-    const response = await db.db().collection(COLLECTION_NAME).updateOne({_id: ObjectID(_id)}, {
-        $set: {
-            name,
-            state,
-            description,
-            shortDescription,
-            plannedSpendings,
-            actualSpendings,
-            image,
-            amount,
-            createdAtTS
-        }
+    const response = await db.db().collection(COLLECTION_NAME).updateOne({_id: ObjectID(data.id)}, {
+        $set: projectFields.reduce((acc, key) => ({
+            ...acc,
+            [key]: data[key]
+        }), {})
     });
 
     // Check the result
@@ -122,5 +78,5 @@ module.exports.update = async function ({
 };
 
 module.exports.list = async function () {
-    return (await db.db().collection(COLLECTION_NAME).find({}).toArray());
+    return (await db.db().collection(COLLECTION_NAME).find({}).toArray()).map(stringifyField);
 };
