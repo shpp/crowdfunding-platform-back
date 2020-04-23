@@ -3,7 +3,7 @@
   "volumes": [
      "storage:/storage:rw",
      "assets:/assets:rw",
-     "/project/migrations:/migrations:rw"
+     "state:/state:rw"
   ],
   "cacheable-environment": [
     "package.json",
