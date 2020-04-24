@@ -61,10 +61,19 @@ async function sumTransactions(project) {
         .filter(t => t.status === 'success');
 
     const amount_funded = transactions.reduce((sum, t) => sum + (t.amount || 0), 0);
+    const this_month_funded = transactions
+        .filter(({created_at}) => {
+            const transactionDate = new Date(created_at);
+            const now = new Date();
+            return transactionDate.getFullYear() === now.getFullYear() && transactionDate.getMonth() === now.getMonth()
+        })
+        .reduce((sum, t) => sum + (t.amount || 0), 0);
+
     return {
         ...project,
         // Add dynamically calculated properties
         amount_funded,
+        this_month_funded,
         completed: amount_funded >= project.amount
     };
 }
@@ -85,7 +94,7 @@ router.route('/list')
         let projects = await Project.list();
 
         // Select only published projects
-        projects = projects.filter(p => p.state === 'published');
+        projects = projects.filter(p => p.state !== 'archived');
 
         // Populate response with funded amount
         projects = await Promise.all(projects.map(sumTransactions));
