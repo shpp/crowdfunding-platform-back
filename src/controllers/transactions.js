@@ -30,7 +30,7 @@ router.route('/create')
         // Create a transaction
         const transactionId = await Transaction.create({
             ...req.body,
-            status: 'confirmed'
+            status: 'success'
         });
 
         // Check DB operation for the error
@@ -125,7 +125,7 @@ router.route('/liqpay-confirmation')
         }
 
         // Determine project ID
-        const project_id = data.order_id.split(':')[1] || (await Project.getByField('shpp-kowo', 'slug'))._id;
+        const project_id = data.order_id.split(':')[1] || (await Project.find({slug: 'shpp-kowo'}))._id;
 
         // Create a transaction
         const transactionId = await Transaction.create({
@@ -139,7 +139,8 @@ router.route('/liqpay-confirmation')
             payment_id: String(data.payment_id),
             status: data.status,
             order_id: order._id,
-            subscription: data.action === 'subscribe'
+            subscription: data.action === 'subscribe',
+            action: data.action
         });
 
         // Respond with 500 code in case of transaction creation failure.

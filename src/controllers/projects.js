@@ -58,7 +58,7 @@ async function sumTransactions(project) {
     // Fetch transactions by given project ID
     const transactions = (await Transaction.listByProjectId(project._id))
         // Count only confirmed transactions
-        .filter(t => t.status === 'confirmed');
+        .filter(t => t.status === 'success');
 
     const amount_funded = transactions.reduce((sum, t) => sum + (t.amount || 0), 0);
     return {

@@ -110,6 +110,10 @@ module.exports.transaction = {
             ...required,
             inclusion: ['manual', 'liqpay']
         },
+        status: {
+            ...required,
+            inclusion: ['success', 'subscribed', 'wait_accept']
+        },
     },
     toggle: {id: ID},
     list: {

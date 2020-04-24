@@ -16,8 +16,8 @@ module.exports.create = async function (data) {
 
     const transactionFields = [
         'type', 'donator_name', 'donator_phone',
-        'donator_surname', 'donator_email', 'order_id',
-        'payment_id', 'subscription', 'amount', 'status'
+        'donator_surname', 'donator_email', 'payment_id',
+        'subscription', 'amount', 'status', 'action'
     ];
 
     // Update project record
@@ -27,13 +27,13 @@ module.exports.create = async function (data) {
     }), {});
 
     const project_id = ObjectID(data.project_id);
-    const status = ['success', 'wait_accept', 'subscribed'].includes(data.status) ? 'confirmed' : data.status;
+    const order_id = ObjectID(data.order_id);
 
     transaction = {
         ...transaction,
         project_id,
-        status,
-        time: new Date(),
+        order_id,
+        created_at: new Date(),
     };
 
     // Save transaction record to DB
@@ -70,7 +70,7 @@ module.exports.reaffirm = async function (data) {
     // Update transaction record
     const response = await db.db().collection(COLLECTION_NAME).updateOne({_id: ObjectID(data.id)}, {
         $set: {
-            status: 'confirmed'
+            status: 'success'
         }
     });
 
@@ -85,7 +85,8 @@ module.exports.listByProjectId = async function (id) {
         return null;
     }
 
-    return (await db.db().collection(COLLECTION_NAME).find({project_id: ObjectID(id)}).toArray());
+    return (await db.db().collection(COLLECTION_NAME).find({project_id: ObjectID(id)}).toArray())
+        .filter(({status}) => status === 'success');
 };
 
 module.exports.list = async function () {
