@@ -60,14 +60,14 @@ async function sumTransactions(project) {
         // Count only confirmed transactions
         .filter(t => t.status === 'success');
 
-    const amount_funded = transactions.reduce((sum, t) => sum + (t.amount || 0), 0);
+    const amount_funded = transactions.reduce((sum, t) => sum + (Math.floor(t.amount) || 0), 0);
     const this_month_funded = transactions
         .filter(({created_at}) => {
             const transactionDate = new Date(created_at);
             const now = new Date();
             return transactionDate.getFullYear() === now.getFullYear() && transactionDate.getMonth() === now.getMonth()
         })
-        .reduce((sum, t) => sum + (t.amount || 0), 0);
+        .reduce((sum, t) => sum + (Math.floor(t.amount) || 0), 0);
 
     return {
         ...project,
