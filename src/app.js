@@ -23,8 +23,8 @@ if (process.env.NODE_ENV === 'development') {
         credentials: true
     }));
 }
-app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // Set up logging middleware
 app.use(require('./middlewares/log'));
