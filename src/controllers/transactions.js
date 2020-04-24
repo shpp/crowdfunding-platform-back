@@ -134,7 +134,7 @@ router.route('/liqpay-confirmation')
             amount: data.amount_debit,
             donator_name: order.donator_name || data.sender_first_name,
             donator_email: order.donator_email,
-            donator_surname: order.surname || data.sender_last_name,
+            donator_surname: order.donator_surname || data.sender_last_name,
             donator_phone: data.sender_phone,
             payment_id: String(data.payment_id),
             status: data.status,
