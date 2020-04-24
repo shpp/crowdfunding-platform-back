@@ -41,8 +41,8 @@ module.exports.get = async function (id) {
     return stringifyField(await db.db().collection(COLLECTION_NAME).findOne({_id: ObjectID(id)}));
 };
 
-module.exports.getByField = async function (value, key) {
-    return stringifyField(await db.db().collection(COLLECTION_NAME).findOne({[key]: value}));
+module.exports.find = async function (search) {
+    return stringifyField(await db.db().collection(COLLECTION_NAME).findOne(search));
 };
 
 module.exports.update = async function (data) {

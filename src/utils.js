@@ -41,7 +41,7 @@ module.exports.toHex = function (str) {
 };
 
 module.exports.stringifyField = function (obj, key = '_id') {
-    return {
+    return !obj ? null : {
         ...obj,
         [key]: String(obj[key])
     }

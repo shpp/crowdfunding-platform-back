@@ -31,7 +31,7 @@ module.exports.create = async function (data) {
         logger.error('Invalid action "create order"', {data: {validation, data}});
         return
     }
-    const { _id: project_id } = await Project.getByField('shpp-kowo', 'slug');
+    const { _id: project_id } = await Project.find({slug: 'shpp-kowo'});
     // Create order
     const order = {
         created_at: ~~(+new Date()),

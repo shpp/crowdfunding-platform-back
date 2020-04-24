@@ -9,6 +9,7 @@ module.exports.up = async function () {
       slug: 'shpp-kowo',
       name: 'Діяльність Ш++/КОВО',
       state: 'unpublished',
+      amount: 80000,
       created_at: Date.now()
     })
   }
