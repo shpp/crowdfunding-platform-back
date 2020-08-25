@@ -36,11 +36,9 @@ module.exports.sendMail = (
         if(recipient !== process.env.ADMIN_MAIL) {
             const layoutFileName = getEmailTemplatePath('user/' + templateName.split('/')[1] + '/layout');
             handlebars.registerPartial('layout', fs.readFileSync(layoutFileName, 'utf8'));
-            logger.debug('recipient is not admin', {data: recipient, layoutFileName})
         } else {
             const layoutFileName = getEmailTemplatePath('admin/layout');
             handlebars.registerPartial('layout', fs.readFileSync(layoutFileName, 'utf8'));
-            logger.debug('recipient is admin', {data: recipient, layoutFileName})
         }
 
         const template = handlebars.compile(rawEmail)(templateVariables);
