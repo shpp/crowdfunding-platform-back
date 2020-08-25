@@ -1,3 +1,5 @@
+{{#extend "layout"}}
+{{#content "content"}}
 <div>
   <p><b>Человек подддержал проект на <a href="{{site_url}}">{{site_url}}</a></b></p>
   {{#if personDefined}}
@@ -11,3 +13,5 @@
   <p><strong>Действие: </strong>{{action}}</p>
   <p><strong>ID покупки: </strong>{{order_id}}</p>
 </div>
+{{/content}}
+{{/extend}}

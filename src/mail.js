@@ -34,12 +34,13 @@ module.exports.sendMail = (
             return;
         }
         if(recipient !== process.env.ADMIN_MAIL) {
-            try {
-                const layoutFileName = getEmailTemplatePath('user/' + templateName.split('/')[1] + '/layout');
-                handlebars.registerPartial('layout', fs.readFileSync(layoutFileName, 'utf8'));
-            } catch (e) {
-                logger.error('cannot read layout file', {data: {templateName, recipient, admin: process.env.ADMIN_MAIL}})
-            }
+            const layoutFileName = getEmailTemplatePath('user/' + templateName.split('/')[1] + '/layout');
+            handlebars.registerPartial('layout', fs.readFileSync(layoutFileName, 'utf8'));
+            logger.debug('recipient is not admin', {data: recipient, layoutFileName})
+        } else {
+            const layoutFileName = getEmailTemplatePath('admin/layout');
+            handlebars.registerPartial('layout', fs.readFileSync(layoutFileName, 'utf8'));
+            logger.debug('recipient is admin', {data: recipient, layoutFileName})
         }
 
         const template = handlebars.compile(rawEmail)(templateVariables);

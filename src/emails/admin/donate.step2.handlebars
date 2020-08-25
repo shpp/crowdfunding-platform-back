@@ -1,3 +1,5 @@
+{{#extend "layout"}}
+{{#content "content"}}
 <div>
   <p><b>Человек ввёл свои реквизиты на <a href="{{site_url}}">{{site_url}}</a></b></p>
   {{#if email}}
@@ -14,3 +16,5 @@
     <p><strong>Просит подписать его на рассылку донаторам</strong></p>
   {{/if}}
 </div>
+{{/content}}
+{{/extend}}

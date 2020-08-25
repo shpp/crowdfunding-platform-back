@@ -1,3 +1,5 @@
+{{#extend "layout"}}
+{{#content "content"}}
 <div>
   <p><strong>Произошла ошибка при оплате на <a href="{{site_url}}">{{site_url}}</a></strong></p>
   {{#if user}}
@@ -20,3 +22,5 @@
   <p><strong>ID покупки: </strong>{{order_id}}</p>
   <p>Нужно узнать у техподдержки liqpay, в чём причина проблемы.</p>
 </div>
+{{/content}}
+{{/extend}}
