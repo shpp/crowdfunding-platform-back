@@ -14,7 +14,7 @@ module.exports.multerImageFilter = function (req, file, cb) {
 };
 
 module.exports.sendResponse = (res, code, data) => {
-    logger.info(`[response] ${code} ${JSON.stringify(data).slice(0, 200)}`);
+    logger.info(`[response] ${code} ${(JSON.stringify(data) || '').slice(0, 200)}`);
     if (code === 200) {
         res.status(200).send({
             ...data,
