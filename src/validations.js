@@ -34,7 +34,8 @@ module.exports.order = {
         newsletter: (value) => allowEmpty(value, {type: 'boolean'})
     },
     get: {id: ID},
-    update: {id: ID}
+    update: {id: ID},
+    list: {}
 };
 
 module.exports.env = {
@@ -56,6 +57,7 @@ module.exports.env = {
 
     ADMIN_TOKEN: {...required},
 };
+
 module.exports.project = {
     create: {
         name: {...required}
@@ -96,6 +98,7 @@ module.exports.project = {
         currency: (value) => allowEmpty(value, currency),
     }
 };
+
 module.exports.transaction = {
     create: {
         amount,
@@ -124,3 +127,5 @@ module.exports.transaction = {
         signature: {...required}
     }
 };
+
+

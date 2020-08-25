@@ -60,7 +60,6 @@ router.post('/:project_id/donated', async function(req, res) {
     // save this event to DB
     const order = await Order.update({
         ...req.body,
-        status: 'step-2'
     });
 
     // Check DB operation for the error
@@ -100,6 +99,15 @@ router.post('/:project_id/donated', async function(req, res) {
     }
 
     sendResponse(res, 200);
+});
+
+router.get('/list-subscriptions', async function(req, res) {
+    const subscritpions = await Order.listSubscriptions();
+    const money_amount = subscritpions.reduce((acc, {amount}) => acc+amount, 0);
+    const donators_amount = subscritpions.length;
+
+    // Respond with success and subscriptions info.
+    sendResponse(res, 200, {money_amount, donators_amount});
 });
 
 module.exports = router;

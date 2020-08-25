@@ -89,3 +89,7 @@ module.exports.update = async function (data) {
 module.exports.list = async function () {
     return (await db.db().collection(COLLECTION_NAME).find({}).toArray()).map(stringifyField);
 };
+
+module.exports.listSubscriptions = async function () {
+    return (await db.db().collection(COLLECTION_NAME).find({status: 'subscribed'}).toArray()).map(stringifyField);
+};

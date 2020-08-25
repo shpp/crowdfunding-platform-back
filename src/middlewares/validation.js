@@ -19,7 +19,8 @@ const routeToValidator = new Map(Object.entries({
     '/reaffirm': 'toggle',
     '/list': 'list',
     '/liqpay-confirmation': 'createLiqpay',
-    '/button': 'button'
+    '/button': 'button',
+    '/list-subscriptions': 'list'
 }));
 
 module.exports = function(req, res, next) {

@@ -154,9 +154,9 @@ router.route('/liqpay-confirmation')
             // add transaction to order
             await Order.update({
                 ...data,
-                _id: data.order_id,
+                id: data.order_id,
                 transaction_id: transactionId,
-                status: 'step-3'
+                status: data.status // 'step-3'
             });
         } else {
             sendMail('admin/donate.project', emailVars, 'Человек поддержал проект на ' + process.env.FRONTEND_URL);
