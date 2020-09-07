@@ -159,7 +159,7 @@ router.route('/liqpay-confirmation')
                 status: data.action === 'pay' ? 'success' : 'subscribed' // 'step-3'
             });
         } else {
-            sendMail('admin/donate.project', emailVars, 'Человек поддержал проект на ' + process.env.FRONTEND_URL);
+            sendMail('admin/donate.project.step3', emailVars, 'Этап 3: Человек поддержал проект на ' + process.env.FRONTEND_URL);
         }
         sendResponse(res, 200, {info: "transaction successfully added"});
     });

@@ -10,6 +10,7 @@ const validation = require('../middlewares/validation');
 const logger = require('../log');
 const utils = require('../utils');
 const liqpayClient = require('../liqpay_client');
+const {sendMail} = require("../mail");
 
 const {sendResponse} = utils;
 
@@ -109,6 +110,70 @@ router.route('/upload-image')
         sendResponse(res, 200);
     });
 
+router.route('/donate-step-1')
+  .get(async function (req, res) {
+    // Obtain a project from DB
+    const project = await Project.get(req.query['project_id']);
+
+    // Check if project with specified ID exist and published
+    if (project === null || project.state !== 'published') {
+      sendResponse(res, 400, {error: 'The project does not exist.'});
+      return;
+    }
+
+    const descriptions = {
+      uk: 'Безповоротна допомога проекту "' + project[`name_${req.query.language}`] + '"',
+      en: 'Donation to the project "' + project[`name_${req.query.language}`] + '"'
+    };
+
+    // TODO: add email notifications for admins
+    const mailData = {
+      ...req.query,
+      description: descriptions[req.query.language || 'uk'],
+      site_url: process.env.FRONTEND_URL
+    };
+    sendMail('admin/donate.project.step1', mailData, 'Этап 1: Человек собирается поддержать проект на ' + process.env.FRONTEND_URL);
+
+    // Generate LiqPay button
+    const cnb_object = liqpayClient.cnb_object({
+      action: 'paydonate',
+      // different amount per currency. default is UAH
+      amount: req.query.currency === 'EUR' ? '20' : '300',
+      currency: req.query.currency || 'UAH',
+      language: req.query.language || 'uk',
+      description: descriptions[req.query.language || 'uk'],
+      order_id: uuidv4() + ':' + req.query['project_id'],
+      version: '3',
+      result_url: process.env.FRONTEND_URL + '/project/' + req.query['project_id'],
+      server_url: process.env.SERVER_URL + '/api/v1/transactions/liqpay-confirmation'
+    });
+    sendResponse(res, 200, cnb_object);
+  });
+
+router.route('/donate-step-2')
+  .post(async function (req, res) {
+    // Obtain a project from DB
+    const project = await Project.get(req.body['project_id']);
+
+    // Check if project with specified ID exist and published
+    if (project === null || project.state !== 'published') {
+      sendResponse(res, 400, {error: 'The project does not exist.'});
+      return;
+    }
+
+    const mailData = {
+      ...req.body,
+      UAH_amount: req.body.currency !== 'UAH' && req.body.UAH_amount,
+      site_url: process.env.FRONTEND_URL,
+    };
+
+    // notify admin
+    sendMail('admin/donate.project.step2', mailData, 'Этап 2: Человек ввёл свои реквизиты на ' + process.env.FRONTEND_URL);
+
+    sendResponse(res, 200);
+  });
+
+// legacy, not using anymore, we use donate-step-1 instead
 router.route('/button')
     .get(async function (req, res) {
         // Obtain a project from DB

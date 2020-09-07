@@ -1,0 +1,11 @@
+{{#extend "layout"}}
+  {{#content "content"}}
+    <div>
+      <p><b>Человек собирается поддержать проект на <a href="{{site_url}}">{{site_url}}</a></b></p>
+      {{#if phone}}
+        <p><strong>Телефон: </strong><a href="tel:{{phone}}">{{phone}}</a></p>
+      {{/if}}
+      <p><strong>Описание: </strong>{{description}}</p>
+    </div>
+  {{/content}}
+{{/extend}}

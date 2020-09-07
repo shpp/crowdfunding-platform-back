@@ -1,0 +1,13 @@
+{{#extend "layout"}}
+{{#content "content"}}
+<div>
+  <p><b>Человек ввёл свои реквизиты на <a href="{{site_url}}">{{site_url}}</a></b></p>
+  {{#if phone}}
+    <p><strong>Телефон: </strong><a href="tel:{{phone}}">{{phone}}</a></p>
+  {{/if}}
+  <p><strong>Сумма: </strong>{{amount}} {{currency}} {{#if UAH_amount}}({{UAH_amount}} UAH){{/if}}</p>
+  <p><strong>Описание: </strong>{{description}}</p>
+  <p><strong>ID покупки: </strong>{{order_id}}</p>
+</div>
+{{/content}}
+{{/extend}}
