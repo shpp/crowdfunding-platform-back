@@ -2,8 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const validate = require("validate.js");
-import * as Sentry from "@sentry/node";
-import * as Tracing from '@sentry/tracing';
+const Sentry = require("@sentry/node");
+const Tracing = require('@sentry/tracing');
 
 const logger = require('./log');
 const validations = require('./validations');
