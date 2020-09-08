@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const validate = require("validate.js");
+import * as Sentry from "@sentry/node";
+import * as Tracing from '@sentry/tracing';
 
 const logger = require('./log');
 const validations = require('./validations');
@@ -16,6 +18,18 @@ if (envValidationResult) {
 
 // Create Express app instance
 let app = express();
+
+Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+    integrations: [
+        // enable HTTP calls tracing
+        new Sentry.Integrations.Http({ tracing: true }),
+        // enable Express.js middleware tracing
+        new Tracing.Integrations.Express({ app }),
+    ],
+    tracesSampleRate: 1.0,
+});
+
 
 if (process.env.NODE_ENV === 'development') {
     app.use(cors({

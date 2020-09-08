@@ -25,7 +25,8 @@
 
         "FILE_STORAGE_PATH=\"\"": "FILE_STORAGE_PATH=/assets",
 
-        "ADMIN_TOKEN=\"\"": "ADMIN_TOKEN='<<ADMIN_TOKEN>>'"
+        "ADMIN_TOKEN=\"\"": "ADMIN_TOKEN='<<ADMIN_TOKEN>>'",
+        "SENTRY_DSN=\"\"": "SENTRY_DSN='<<SENTRY_DSN>>'"
       }
     }
   ]

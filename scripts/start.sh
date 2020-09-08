@@ -24,5 +24,7 @@ export FILE_STORAGE_PATH=""
 # Admin password token (can be generated with generate_auth_token.js)
 export ADMIN_TOKEN=""
 
+export SENTRY_DSN=""
+
 # Run the application
 node src/app.js
