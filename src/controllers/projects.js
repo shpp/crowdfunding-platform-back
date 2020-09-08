@@ -121,6 +121,8 @@ router.route('/donate-step-1')
       return;
     }
 
+    const order_id = uuidv4() + ':' + req.query['project_id'];
+
     const descriptions = {
       uk: 'Безповоротна допомога проекту "' + project[`name_${req.query.language}`] + '"',
       en: 'Donation to the project "' + project[`name_${req.query.language}`] + '"'
@@ -129,6 +131,7 @@ router.route('/donate-step-1')
     // TODO: add email notifications for admins
     const mailData = {
       ...req.query,
+      order_id,
       description: descriptions[req.query.language || 'uk'],
       site_url: process.env.FRONTEND_URL
     };
@@ -136,13 +139,13 @@ router.route('/donate-step-1')
 
     // Generate LiqPay button
     const cnb_object = liqpayClient.cnb_object({
+      order_id,
       action: 'paydonate',
       // different amount per currency. default is UAH
       amount: req.query.currency === 'EUR' ? '20' : '300',
       currency: req.query.currency || 'UAH',
       language: req.query.language || 'uk',
       description: descriptions[req.query.language || 'uk'],
-      order_id: uuidv4() + ':' + req.query['project_id'],
       version: '3',
       result_url: process.env.FRONTEND_URL + '/project/' + req.query['project_id'],
       server_url: process.env.SERVER_URL + '/api/v1/transactions/liqpay-confirmation'
