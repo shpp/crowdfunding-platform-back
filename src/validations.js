@@ -119,6 +119,13 @@ module.exports.transaction = {
             inclusion: ['success', 'subscribed', 'wait_accept']
         },
     },
+    update: {
+        _id: ID,
+        donator_phone: (value) => allowEmpty(value, {
+            format: /\+?[0-9]{10,12}/
+        }),
+        donator_name: (value) => allowEmpty(value, {type: 'string'}),
+    },
     toggle: {id: ID},
     list: {
         id: (value) => allowEmpty(value, ID)

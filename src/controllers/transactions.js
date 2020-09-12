@@ -73,6 +73,21 @@ router.route('/reaffirm')
         sendResponse(res, 200);
     });
 
+router.route('/update')
+    .post(auth, async function (req, res) {
+        // Reaffirm a transaction
+        const status = await Transaction.update(req.body);
+
+        // Check DB operation for the error
+        if (!status) {
+            sendResponse(res, 500, {error: 'Operation can\'t be performed. Please, try again later.'});
+            return;
+        }
+
+        // Respond with success and transaction ID.
+        sendResponse(res, 200);
+    });
+
 router.route('/list')
     .get(auth, async function (req, res) {
         let transactions;
@@ -135,9 +150,8 @@ router.route('/liqpay-confirmation')
             project_id,
             type: 'liqpay',
             amount: data.amount_debit,
-            donator_name: order.donator_name || data.sender_first_name,
+            donator_name: (order.donator_name || data.sender_first_name) + (order.donator_surname || data.sender_last_name),
             donator_email: order.donator_email,
-            donator_surname: order.donator_surname || data.sender_last_name,
             donator_phone: data.sender_phone || order.donator_phone,
             payment_id: String(data.payment_id),
             status: data.status,

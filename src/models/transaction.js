@@ -16,7 +16,7 @@ module.exports.create = async function (data) {
 
     const transactionFields = [
         'type', 'donator_name', 'donator_phone',
-        'donator_surname', 'donator_email', 'payment_id',
+        'donator_email', 'payment_id',
         'subscription', 'amount', 'status', 'action', 'order_id',
         'liqpay_order_id'
     ];
@@ -54,6 +54,25 @@ module.exports.revoke = async function (data) {
     const response = await db.db().collection(COLLECTION_NAME).updateOne({_id: ObjectID(data.id)}, {
         $set: {
             status: 'revoked'
+        }
+    });
+
+    // Check the result
+    return response.result.ok === 1;
+};
+
+module.exports.update = async function (data) {
+    const validation = validate(data, validations.transaction.update);
+    if (validation) {
+        logger.error('Invalid action "update transaction"', {data: {validation, data}});
+        return null;
+    }
+
+    // Update transaction record
+    const response = await db.db().collection(COLLECTION_NAME).updateOne({_id: ObjectID(data._id)}, {
+        $set: {
+            donator_phone: data.donator_phone,
+            donator_name: data.donator_name
         }
     });
 
