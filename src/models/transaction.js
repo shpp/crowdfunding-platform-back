@@ -17,7 +17,8 @@ module.exports.create = async function (data) {
     const transactionFields = [
         'type', 'donator_name', 'donator_phone',
         'donator_surname', 'donator_email', 'payment_id',
-        'subscription', 'amount', 'status', 'action'
+        'subscription', 'amount', 'status', 'action', 'order_id',
+        'liqpay_order_id'
     ];
 
     // Update project record

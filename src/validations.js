@@ -31,6 +31,7 @@ module.exports.order = {
         email: (value) => allowEmpty(value, {email: true}),
         name: (value) => allowEmpty(value, {type: 'string'}),
         surname: (value) => allowEmpty(value, {type: 'string'}),
+        phone: (value) => allowEmpty(value, {type: 'string'}),
         newsletter: (value) => allowEmpty(value, {type: 'boolean'})
     },
     get: {id: ID},

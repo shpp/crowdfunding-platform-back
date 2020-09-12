@@ -10,13 +10,15 @@ const Project = require("./project");
 
 const COLLECTION_NAME = 'orders';
 
+// here key is fieldname in DB and value is fieldname in
 const orderFields = new Map(Object.entries({
     donator_email: 'email',
     donator_name: 'name',
     donator_surname: 'surname',
     donator_newsletter: 'newsletter',
-    transaction_id: 'transactionId',
+    donator_phone: 'phone',
 
+    transaction_id: 'transaction_id',
     subscribe: 'subscribe',
     amount: 'amount',
     currency: 'currency',
@@ -34,7 +36,6 @@ module.exports.create = async function (data) {
     const { _id: project_id } = await Project.find({slug: 'shpp-kowo'});
     // Create order
     const order = {
-        created_at: ~~(+new Date()),
         project_id
     };
     orderFields.forEach((value, key) => {
@@ -75,7 +76,6 @@ module.exports.update = async function (data) {
     orderFields.forEach((value, key) => {
         newOrder[key] = data[value] || previousOrder[key]
     });
-
 
     // Update order record
     const response = await db.db().collection(COLLECTION_NAME).updateOne({_id: ObjectID(data.id)}, {

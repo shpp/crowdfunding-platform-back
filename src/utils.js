@@ -1,6 +1,5 @@
 const logger = require('./log');
 
-
 module.exports.multerImageFilter = function (req, file, cb) {
     // Check file size (Must be < 10MB)
     // if (file.size > 10000000) {
@@ -43,6 +42,8 @@ module.exports.toHex = function (str) {
 module.exports.stringifyField = function (obj, key = '_id') {
     return !obj ? null : {
         ...obj,
-        [key]: String(obj[key])
+        [key]: String(obj[key]),
+        // i know it is hardcode, but i think this is elegant
+        created_at: +new Date(obj._id.getTimestamp())
     }
 };

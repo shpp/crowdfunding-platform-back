@@ -3,6 +3,7 @@ const multer = require('multer');
 const uuidv4 = require('uuid/v4');
 
 const Project = require('../models/project');
+const Order = require('../models/order');
 const Transaction = require('../models/transaction');
 const auth = require('../middlewares/auth');
 const validation = require('../middlewares/validation');
@@ -110,6 +111,13 @@ router.route('/upload-image')
         sendResponse(res, 200);
     });
 
+/*
+ * req.query includes:
+ *
+ * @param project_id - string mongo id of project
+ * @param language - uk | en
+ * @param phone - donator phone
+ */
 router.route('/donate-step-1')
   .get(async function (req, res) {
     // Obtain a project from DB
@@ -121,7 +129,18 @@ router.route('/donate-step-1')
       return;
     }
 
-    const order_id = uuidv4() + ':' + req.query['project_id'];
+    const currency = req.query.language === 'uk' ? 'UAH' : 'EUR';
+    const amount = currency === 'EUR' ? 20 : 300;
+
+    // save this order to DB
+    const order_id_from_db = await Order.create({
+      ...req.query,
+      amount,
+      currency,
+      subscribe: false,
+      status: 'step-1'
+    });
+    const order_id = order_id_from_db + ':' + req.query['project_id'];
 
     const descriptions = {
       uk: 'Безповоротна допомога проекту "' + project[`name_${req.query.language}`] + '"',
@@ -140,10 +159,10 @@ router.route('/donate-step-1')
     // Generate LiqPay button
     const cnb_object = liqpayClient.cnb_object({
       order_id,
+      amount,
+      currency,
       action: 'paydonate',
       // different amount per currency. default is UAH
-      amount: req.query.currency === 'EUR' ? '20' : '300',
-      currency: req.query.currency || 'UAH',
       language: req.query.language || 'uk',
       description: descriptions[req.query.language || 'uk'],
       version: '3',
@@ -153,6 +172,15 @@ router.route('/donate-step-1')
     sendResponse(res, 200, cnb_object);
   });
 
+/*
+ * req.body data includes:
+ *
+ * @param ...parsed liqpay response - https://www.liqpay.ua/documentation/api/callback,
+ * @param project_id,
+ * @param UAH_amount - despite the currency, amount of donation in UAH,
+ * @param _notify - boolean, hack for frontend, not used in backend
+ *
+ */
 router.route('/donate-step-2')
   .post(async function (req, res) {
     // Obtain a project from DB
@@ -195,16 +223,16 @@ router.route('/button')
 
         // Generate LiqPay button
         const button = liqpayClient.cnb_form({
-            'action': 'paydonate',
+            action: 'paydonate',
             // different amount per currency. default is UAH
-            'amount': req.query.currency === 'EUR' ? '20' : '300',
-            'currency': req.query.currency || 'UAH',
-            'language': req.query.language || 'uk',
-            'description': descriptions[req.query.language || 'uk'],
-            'order_id': uuidv4() + ':' + req.query['id'],
-            'version': '3',
-            'result_url': process.env.FRONTEND_URL + '/project/' + req.query['id'],
-            'server_url': process.env.SERVER_URL + '/api/v1/transactions/liqpay-confirmation'
+            amount: req.query.currency === 'EUR' ? '20' : '300',
+            currency: req.query.currency || 'UAH',
+            language: req.query.language || 'uk',
+            description: descriptions[req.query.language || 'uk'],
+            order_id: uuidv4() + ':' + req.query['id'],
+            version: '3',
+            result_url: process.env.FRONTEND_URL + '/project/' + req.query['id'],
+            server_url: process.env.SERVER_URL + '/api/v1/transactions/liqpay-confirmation'
         });
         sendResponse(res, 200, {button});
     });

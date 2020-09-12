@@ -105,14 +105,20 @@ router.route('/liqpay-confirmation')
             pay: 'Оплатил одноразово',
             regular: 'Ежемесячное списание денег'
         };
+        const [
+          order_id,
+          project_id = (await Project.find({slug: 'shpp-kowo'}))._id
+        ] = (data.order_id || "").split(':');
 
-        const order = await Order.get(data.order_id) || {};
+        const order = (await Order.get(order_id)) || {};
+
         const emailVars = {
             ...data,
             user: !!(order.donator_name || order.donator_surname || data.sender_first_name || data.sender_last_name),
             name: order.donator_name || data.sender_first_name || 'неизвестно',
             surname: order.donator_surname || data.sender_last_name  || 'неизвестно' ,
             email: order.donator_email,
+            phone: order.donator_phone,
             action: actions[data.action] || data.action,
             site_url: process.env.FRONTEND_URL
         };
@@ -124,9 +130,6 @@ router.route('/liqpay-confirmation')
             return;
         }
 
-        // Determine project ID
-        const project_id = data.order_id.split(':')[1] || (await Project.find({slug: 'shpp-kowo'}))._id;
-
         // Create a transaction
         const transactionId = await Transaction.create({
             project_id,
@@ -135,12 +138,13 @@ router.route('/liqpay-confirmation')
             donator_name: order.donator_name || data.sender_first_name,
             donator_email: order.donator_email,
             donator_surname: order.donator_surname || data.sender_last_name,
-            donator_phone: data.sender_phone,
+            donator_phone: data.sender_phone || order.donator_phone,
             payment_id: String(data.payment_id),
             status: data.status,
             order_id: order._id,
             subscription: data.action === 'subscribe',
-            action: data.action
+            action: data.action,
+            liqpay_order_id: data.order_id
         });
 
         // Respond with 500 code in case of transaction creation failure.
@@ -154,7 +158,7 @@ router.route('/liqpay-confirmation')
             // add transaction to order
             await Order.update({
                 ...data,
-                id: data.order_id,
+                id: order_id,
                 transaction_id: transactionId,
                 status: data.action === 'pay' ? 'success' : 'subscribed' // 'step-3'
             });
