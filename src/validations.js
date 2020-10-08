@@ -73,13 +73,11 @@ module.exports.project = {
         description_en: {...required},
         short_description_en: {...required},
         planned_spendings_en: {...required},
-        actual_spendings_en: {...required},
         // ua locale
         name_uk: {...required},
         description_uk: {...required},
         short_description_uk: {...required},
         planned_spendings_uk: {...required},
-        actual_spendings_uk: {...required},
         state: {
             ...required,
             inclusion: ['unpublished', 'published', 'archived']
