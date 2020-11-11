@@ -133,7 +133,7 @@ router.route('/liqpay-confirmation')
             name: order.donator_name || data.sender_first_name || 'неизвестно',
             surname: order.donator_surname || data.sender_last_name  || 'неизвестно' ,
             email: order.donator_email,
-            phone: order.donator_phone,
+            phone: order.donator_phone || data.sender_phone,
             action: actions[data.action] || data.action,
             site_url: process.env.FRONTEND_URL
         };
@@ -171,7 +171,7 @@ router.route('/liqpay-confirmation')
             sendMail('admin/donate.step3', emailVars, 'Этап 3: Поступила оплата на ' + process.env.FRONTEND_URL);
             // add transaction to order
             await Order.update({
-                ...data,
+                ...emailVars,
                 id: order_id,
                 transaction_id: transactionId,
                 status: data.action === 'pay' ? 'success' : 'subscribed' // 'step-3'
